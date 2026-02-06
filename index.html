@@ -1,82 +1,598 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
 <title>System Alert</title>
 <style>
-  body {
-    margin: 0;
-    background: black;
-    color: #00ff00;
-    font-family: monospace;
-    overflow: hidden;
+  :root{
+    --g: #00ff66;
+    --r: #ff0033;
+    --bg: #000;
+    --muted: rgba(0,255,102,.65);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--g);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    overflow:hidden;
   }
 
-  .glitch {
-    font-size: 22px;
-    padding: 20px;
-    animation: flicker 0.15s infinite;
+  /* Fullscreen "tap to arm" overlay */
+  #arm {
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(ellipse at center, rgba(0,255,102,.08), rgba(0,0,0,.96) 65%);
+    z-index: 50;
+    padding: 22px;
+    text-align:center;
   }
-
-  @keyframes flicker {
-    0% { opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { opacity: 0.85; }
+  #arm .card{
+    width:min(560px, 92vw);
+    border:1px solid rgba(0,255,102,.35);
+    border-radius:18px;
+    padding:20px 18px;
+    background: rgba(0,0,0,.75);
+    box-shadow: 0 0 0 1px rgba(0,255,102,.1), 0 0 42px rgba(0,255,102,.1);
   }
+  #arm h1{
+    margin:0 0 10px;
+    font-size: 20px;
+    letter-spacing:.08em;
+  }
+  #arm p{ margin: 8px 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+  #arm button{
+    margin-top: 14px;
+    width: 100%;
+    padding: 14px 14px;
+    border-radius: 14px;
+    border:1px solid rgba(0,255,102,.45);
+    background: linear-gradient(180deg, rgba(0,255,102,.18), rgba(0,0,0,.2));
+    color: var(--g);
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,255,102,.08);
+  }
+  #arm .tiny{ opacity:.7; font-size: 12px; margin-top: 10px; }
 
-  .warning {
-    color: red;
-    font-size: 26px;
-    text-align: center;
-    margin-top: 30px;
+  /* Main layout */
+  #wrap{
+    position:fixed; inset:0;
+    padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+  }
+  .top{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border:1px solid rgba(0,255,102,.22);
+    border-radius: 16px;
+    background: rgba(0,0,0,.45);
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size: 12px;
+    letter-spacing: .1em;
+    color: rgba(255,0,51,.92);
+  }
+  .dot{
+    width:10px; height:10px; border-radius: 50%;
+    background: var(--r);
+    box-shadow: 0 0 12px rgba(255,0,51,.6);
     animation: blink 1s infinite;
   }
+  @keyframes blink{ 50%{ opacity:.1; } }
 
-  @keyframes blink {
-    50% { opacity: 0; }
+  .sig{
+    font-size: 12px;
+    color: rgba(0,255,102,.75);
+    letter-spacing:.12em;
   }
 
-  .bar-container {
-    width: 90%;
-    height: 20px;
-    border: 2px solid #00ff00;
-    margin: 15px auto;
+  .grid{
+    margin-top: 12px;
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    height: calc(100% - 72px);
   }
 
-  .bar {
+  .panel{
+    border:1px solid rgba(0,255,102,.22);
+    border-radius: 18px;
+    background: rgba(0,0,0,.45);
+    padding: 12px;
+    overflow:hidden;
+    position: relative;
+  }
+
+  .title{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .title h2{
+    margin:0;
+    font-size: 13px;
+    letter-spacing:.14em;
+    text-transform: uppercase;
+    color: rgba(0,255,102,.9);
+  }
+  .title .threat{
+    font-size: 12px;
+    letter-spacing: .1em;
+    color: rgba(255,0,51,.92);
+  }
+
+  /* Scanlines + vignette */
+  .panel::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,102,.045),
+        rgba(0,255,102,.045) 1px,
+        rgba(0,0,0,.0) 3px,
+        rgba(0,0,0,.0) 6px
+      );
+    mix-blend-mode: screen;
+    pointer-events:none;
+    opacity:.5;
+  }
+  .panel::after{
+    content:"";
+    position:absolute; inset:-20px;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.6) 85%);
+    pointer-events:none;
+  }
+
+  /* Log area */
+  #log{
+    height: 54vh;
+    overflow:hidden;
+    border-radius: 14px;
+    border:1px solid rgba(0,255,102,.16);
+    padding: 10px;
+    background: rgba(0,0,0,.35);
+    box-shadow: inset 0 0 0 1px rgba(0,255,102,.06);
+  }
+  .line{
+    font-size: 13px;
+    line-height: 1.35;
+    color: rgba(0,255,102,.92);
+    text-shadow: 0 0 12px rgba(0,255,102,.12);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dim{ color: rgba(0,255,102,.62); }
+  .warn{ color: rgba(255,0,51,.95); text-shadow: 0 0 14px rgba(255,0,51,.2); }
+
+  /* Progress bars */
+  .bars{
+    margin-top: 10px;
+    display:grid;
+    gap: 10px;
+  }
+  .barrow{
+    display:grid;
+    grid-template-columns: auto 1fr auto;
+    align-items:center;
+    gap: 10px;
+    font-size: 12px;
+    color: rgba(0,255,102,.75);
+    letter-spacing: .08em;
+  }
+  .track{
+    height: 10px;
+    border-radius: 999px;
+    border:1px solid rgba(0,255,102,.22);
+    overflow:hidden;
+    background: rgba(0,0,0,.35);
+  }
+  .fill{
     height: 100%;
     width: 0%;
-    background: #00ff00;
-    animation: load 4s forwards;
+    background: linear-gradient(90deg, rgba(0,255,102,.75), rgba(0,255,102,.25));
+    box-shadow: 0 0 20px rgba(0,255,102,.18);
+    border-radius: 999px;
+    transition: width .12s linear;
   }
 
-  @keyframes load {
-    from { width: 0%; }
-    to { width: 100%; }
+  /* Big warning footer */
+  #footerWarn{
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border:1px solid rgba(255,0,51,.35);
+    color: rgba(255,0,51,.92);
+    background: rgba(255,0,51,.08);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    text-align:center;
+    font-size: 12px;
+  }
+
+  /* Glitch & shake effects */
+  .shake{
+    animation: shake .14s infinite;
+  }
+  @keyframes shake{
+    0%{ transform: translate(0,0) rotate(0deg); }
+    20%{ transform: translate(1px,-1px) rotate(-.2deg); }
+    40%{ transform: translate(-1px,1px) rotate(.2deg); }
+    60%{ transform: translate(2px,1px) rotate(-.2deg); }
+    80%{ transform: translate(-2px,-1px) rotate(.2deg); }
+    100%{ transform: translate(0,0) rotate(0deg); }
+  }
+
+  .glitchText{
+    position: relative;
+    display:inline-block;
+  }
+  .glitchText::before, .glitchText::after{
+    content: attr(data-text);
+    position:absolute; left:0; top:0;
+    width:100%;
+    overflow:hidden;
+    clip-path: inset(0 0 0 0);
+    opacity:.75;
+    pointer-events:none;
+  }
+  .glitchText::before{
+    transform: translate(1px,0);
+    color: rgba(255,0,51,.9);
+    animation: glitch1 1.2s infinite linear alternate-reverse;
+  }
+  .glitchText::after{
+    transform: translate(-1px,0);
+    color: rgba(0,200,255,.8);
+    animation: glitch2 1.35s infinite linear alternate-reverse;
+  }
+  @keyframes glitch1{
+    0%{ clip-path: inset(0 0 92% 0); }
+    12%{ clip-path: inset(10% 0 60% 0); }
+    25%{ clip-path: inset(55% 0 25% 0); }
+    40%{ clip-path: inset(20% 0 58% 0); }
+    55%{ clip-path: inset(78% 0 5% 0); }
+    70%{ clip-path: inset(35% 0 45% 0); }
+    85%{ clip-path: inset(5% 0 80% 0); }
+    100%{ clip-path: inset(65% 0 15% 0); }
+  }
+  @keyframes glitch2{
+    0%{ clip-path: inset(80% 0 5% 0); }
+    15%{ clip-path: inset(5% 0 82% 0); }
+    30%{ clip-path: inset(60% 0 25% 0); }
+    45%{ clip-path: inset(18% 0 62% 0); }
+    60%{ clip-path: inset(40% 0 40% 0); }
+    75%{ clip-path: inset(72% 0 10% 0); }
+    90%{ clip-path: inset(12% 0 68% 0); }
+    100%{ clip-path: inset(50% 0 30% 0); }
+  }
+
+  /* Screen flash overlay */
+  #flash{
+    position:fixed; inset:0;
+    background: white;
+    opacity:0;
+    pointer-events:none;
+    z-index: 40;
+    transition: opacity .08s linear;
+  }
+
+  /* Red alert overlay */
+  #redalert{
+    position:fixed; inset:0;
+    background: radial-gradient(ellipse at center, rgba(255,0,51,.12), rgba(0,0,0,.85) 65%);
+    opacity:0;
+    pointer-events:none;
+    z-index: 30;
+    transition: opacity .2s ease;
+  }
+
+  /* Subtle CRT warp */
+  #wrap{
+    filter: saturate(1.05) contrast(1.08);
   }
 </style>
 </head>
 <body>
 
-<div class="warning">⚠ REMOTE DEVICE ACCESS ⚠</div>
+<div id="flash"></div>
+<div id="redalert"></div>
 
-<div class="glitch">
-  Establishing secure connection...<br>
-  Bypassing encryption...<br>
-  Accessing device storage...<br>
+<div id="arm">
+  <div class="card">
+    <h1 class="glitchText" data-text="SECURITY CHECK">SECURITY CHECK</h1>
+    <p>This page requires a quick confirmation to continue.</p>
+    <p class="tiny">Tap below to verify device integrity.</p>
+    <button id="armBtn">VERIFY</button>
+    <p class="tiny dim">Tip: turn sound on 😈</p>
+  </div>
 </div>
 
-<div class="bar-container"><div class="bar"></div></div>
+<div id="wrap" aria-hidden="true">
+  <div class="top">
+    <div class="badge"><span class="dot"></span> <span class="glitchText" data-text="REMOTE SESSION ACTIVE">REMOTE SESSION ACTIVE</span></div>
+    <div class="sig" id="sig">SIG: ---- ---- ----</div>
+  </div>
 
-<div class="glitch">
-  📍 Location tracking enabled<br>
-  🎤 Microphone access granted<br>
-  📷 Camera access granted<br>
-  📡 Uploading personal data...
+  <div class="grid">
+    <div class="panel" id="panel">
+      <div class="title">
+        <h2>Device Telemetry</h2>
+        <div class="threat" id="threat">THREAT: SCANNING</div>
+      </div>
+
+      <div id="log"></div>
+
+      <div class="bars">
+        <div class="barrow">
+          <span>ENCRYPT</span>
+          <div class="track"><div class="fill" id="b1"></div></div>
+          <span id="p1">0%</span>
+        </div>
+        <div class="barrow">
+          <span>ACCESS</span>
+          <div class="track"><div class="fill" id="b2"></div></div>
+          <span id="p2">0%</span>
+        </div>
+        <div class="barrow">
+          <span>UPLOAD</span>
+          <div class="track"><div class="fill" id="b3"></div></div>
+          <span id="p3">0%</span>
+        </div>
+      </div>
+
+      <div id="footerWarn">DO NOT TURN OFF YOUR DEVICE</div>
+    </div>
+  </div>
 </div>
 
-<div class="warning">DO NOT TURN OFF YOUR DEVICE</div>
+<script>
+  // --------- Helpers ----------
+  const $ = (id)=>document.getElementById(id);
+  const logEl = $("log");
+  const flashEl = $("flash");
+  const redEl = $("redalert");
+  const panel = $("panel");
 
+  function randHex(n=4){
+    const chars="0123456789ABCDEF";
+    let s="";
+    for(let i=0;i<n;i++) s += chars[Math.floor(Math.random()*chars.length)];
+    return s;
+  }
+  function setSig(){
+    $("sig").textContent = `SIG: ${randHex()} ${randHex()} ${randHex()}`;
+  }
+
+  function addLine(text, cls=""){
+    const d = document.createElement("div");
+    d.className = "line " + cls;
+    d.textContent = text;
+    logEl.appendChild(d);
+    // Keep the last ~22 lines visible
+    while(logEl.childNodes.length > 22) logEl.removeChild(logEl.firstChild);
+  }
+
+  function flash(times=2){
+    let i=0;
+    const go = ()=>{
+      flashEl.style.opacity = "0.9";
+      setTimeout(()=>flashEl.style.opacity="0", 70);
+      i++;
+      if(i<times) setTimeout(go, 130);
+    };
+    go();
+  }
+
+  function vibrate(pattern){
+    try{
+      if(navigator.vibrate) navigator.vibrate(pattern);
+    }catch(e){}
+  }
+
+  // --------- WebAudio "creepy" kit (no external files) ----------
+  let audioCtx, masterGain;
+  function initAudio(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.18;
+    masterGain.connect(audioCtx.destination);
+  }
+
+  function beep(freq=880, dur=0.08, type="square", gain=0.12){
+    if(!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t = audioCtx.currentTime;
+    g.gain.exponentialRampToValueAtTime(gain, t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    o.start(t);
+    o.stop(t+dur+0.02);
+  }
+
+  // A “siren-ish” rising/falling tone
+  let sirenTimer = null;
+  function startSiren(ms=2400){
+    if(!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = "sawtooth";
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(masterGain);
+    o.start();
+    const t0 = audioCtx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.16, t0 + 0.05);
+
+    let up = true;
+    const step = ()=>{
+      const t = audioCtx.currentTime;
+      const target = up ? 880 : 220;
+      o.frequency.exponentialRampToValueAtTime(target, t + 0.22);
+      up = !up;
+    };
+    step();
+    const int = setInterval(step, 240);
+
+    sirenTimer = setTimeout(()=>{
+      clearInterval(int);
+      const t = audioCtx.currentTime;
+      g.gain.exponentialRampToValueAtTime(0.0001, t+0.1);
+      setTimeout(()=>{ try{o.stop();}catch(e){} }, 180);
+    }, ms);
+  }
+
+  function glitchBurst(){
+    panel.classList.add("shake");
+    redEl.style.opacity = "1";
+    flash(3);
+    vibrate([60,40,60,40,120]);
+    beep(1200, 0.06, "square", 0.14);
+    beep(240, 0.18, "sawtooth", 0.12);
+    setTimeout(()=>panel.classList.remove("shake"), 700);
+    setTimeout(()=>redEl.style.opacity = "0", 900);
+  }
+
+  // --------- Sequence ----------
+  const steps = [
+    { t: 350,  msg: "Initializing handshake…", cls: "dim", fx: ()=>beep(660,0.05,"square",0.08) },
+    { t: 700,  msg: "Negotiating secure tunnel…", cls: "dim", fx: ()=>beep(880,0.06,"square",0.08) },
+    { t: 1100, msg: "Bypassing lockscreen policy…", cls: "",   fx: ()=>vibrate([30,30,30]) },
+    { t: 1500, msg: "Extracting device signature…", cls: "",   fx: ()=>{ setSig(); beep(520,0.08,"triangle",0.09);} },
+    { t: 1900, msg: "Installing remote hook: OK", cls: "",     fx: ()=>beep(1040,0.06,"square",0.11) },
+    { t: 2400, msg: "Permission grant: 📍 LOCATION", cls: "warn", fx: glitchBurst },
+    { t: 2900, msg: "Permission grant: 🎤 MICROPHONE", cls: "warn", fx: ()=>{ flash(2); vibrate([80,40,80]); beep(980,0.07,"square",0.12);} },
+    { t: 3400, msg: "Permission grant: 📷 CAMERA", cls: "warn", fx: ()=>{ flash(2); beep(1320,0.06,"square",0.12);} },
+    { t: 3900, msg: "Mirroring notifications…", cls: "", fx: ()=>beep(420,0.08,"sine",0.07) },
+    { t: 4400, msg: "Scraping contacts…", cls: "", fx: ()=>beep(720,0.05,"square",0.09) },
+    { t: 5000, msg: "Uploading private data…", cls: "warn", fx: ()=>startSiren(2200) },
+    { t: 5800, msg: "⚠ DATA EXFILTRATION IN PROGRESS", cls: "warn", fx: ()=>{ redEl.style.opacity="1"; setTimeout(()=>redEl.style.opacity="0",1200);} },
+    { t: 6800, msg: "Finalizing…", cls: "dim", fx: ()=>beep(600,0.08,"triangle",0.08) },
+    { t: 7700, msg: "REMOTE SESSION: ACTIVE", cls: "warn", fx: ()=>{ $("threat").textContent="THREAT: CONFIRMED"; glitchBurst(); } },
+  ];
+
+  function runBars(){
+    const b1=$("b1"), b2=$("b2"), b3=$("b3");
+    const p1=$("p1"), p2=$("p2"), p3=$("p3");
+
+    let a=0, b=0, c=0;
+    const tick = ()=>{
+      a = Math.min(100, a + (Math.random()*6));
+      b = Math.min(100, b + (Math.random()*7));
+      c = Math.min(100, c + (Math.random()*5));
+
+      b1.style.width = a.toFixed(0)+"%"; p1.textContent = a.toFixed(0)+"%";
+      b2.style.width = b.toFixed(0)+"%"; p2.textContent = b.toFixed(0)+"%";
+      b3.style.width = c.toFixed(0)+"%"; p3.textContent = c.toFixed(0)+"%";
+
+      // occasional mini-glitch when near completion
+      if((a>80 && Math.random()<0.12) || (b>85 && Math.random()<0.12) || (c>75 && Math.random()<0.12)){
+        panel.classList.add("shake");
+        flash(1);
+        beep(1400,0.05,"square",0.10);
+        setTimeout(()=>panel.classList.remove("shake"), 140);
+      }
+
+      requestAnimationFrame(()=>{
+        if(a<100 || b<100 || c<100) setTimeout(tick, 110);
+      });
+    };
+    tick();
+  }
+
+  function start(){
+    // show main UI
+    $("arm").style.display = "none";
+    $("wrap").setAttribute("aria-hidden", "false");
+
+    setSig();
+    addLine("BOOT: kernel stream attached", "dim");
+    addLine("NET: wlan0 route verified", "dim");
+    addLine("AUTH: token accepted", "dim");
+
+    // Bars + log sequence
+    runBars();
+
+    steps.forEach(s=>{
+      setTimeout(()=>{
+        addLine(s.msg, s.cls);
+        try{ s.fx && s.fx(); }catch(e){}
+      }, s.t);
+    });
+
+    // Keep adding spooky “live” messages after sequence
+    setTimeout(()=>{
+      $("footerWarn").textContent = "REMOTE OPERATOR CONNECTED";
+      let count = 0;
+      const spam = setInterval(()=>{
+        count++;
+        const pool = [
+          ["PING: keepalive", "dim"],
+          ["STREAM: mic buffer opened", ""],
+          ["GPS: updated coordinates pushed", ""],
+          ["CAM: frame captured", ""],
+          ["SYNC: messages indexed", ""],
+          ["⚠ POLICY VIOLATION DETECTED", "warn"],
+        ];
+        const pick = pool[Math.floor(Math.random()*pool.length)];
+        addLine(pick[0], pick[1]);
+        if(Math.random()<0.22) beep(900 + Math.random()*700, 0.05, "square", 0.09);
+        if(Math.random()<0.12) flash(1);
+        if(Math.random()<0.08) vibrate([30,30,60]);
+        if(count>32) clearInterval(spam);
+      }, 260);
+    }, 8200);
+  }
+
+  // Arm button: must be user gesture to unlock audio + fullscreen + vibration
+  $("armBtn").addEventListener("click", async ()=>{
+    try{
+      // Fullscreen (best effort)
+      const el = document.documentElement;
+      if(el.requestFullscreen) await el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+    }catch(e){}
+
+    initAudio();
+    try{ await audioCtx.resume(); }catch(e){}
+
+    // Immediate "takeover" effects
+    flash(4);
+    redEl.style.opacity = "1";
+    setTimeout(()=>redEl.style.opacity = "0", 900);
+    vibrate([120,60,120,60,220]);
+
+    // Big initial stinger
+    beep(180,0.18,"sawtooth",0.16);
+    beep(880,0.10,"square",0.14);
+    beep(1320,0.08,"square",0.14);
+
+    start();
+  });
+
+  // Tiny extra: tap anywhere to trigger quick glitch (optional)
+  document.addEventListener("click", (e)=>{
+    // ignore clicks while arm overlay exists
+    if($("arm").style.display !== "none") return;
+    if(Math.random() < 0.22){
+      glitchBurst();
+      addLine("⚠ INPUT CAPTURED", "warn");
+    }
+  }, {passive:true});
+</script>
 </body>
 </html>
