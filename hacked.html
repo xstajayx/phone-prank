@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Alert</title>
+<style>
+  body {
+    margin: 0;
+    background: black;
+    color: #00ff00;
+    font-family: monospace;
+    overflow: hidden;
+  }
+
+  .glitch {
+    font-size: 22px;
+    padding: 20px;
+    animation: flicker 0.15s infinite;
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.85; }
+  }
+
+  .warning {
+    color: red;
+    font-size: 26px;
+    text-align: center;
+    margin-top: 30px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .bar-container {
+    width: 90%;
+    height: 20px;
+    border: 2px solid #00ff00;
+    margin: 15px auto;
+  }
+
+  .bar {
+    height: 100%;
+    width: 0%;
+    background: #00ff00;
+    animation: load 4s forwards;
+  }
+
+  @keyframes load {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="warning">⚠ REMOTE DEVICE ACCESS ⚠</div>
+
+<div class="glitch">
+  Establishing secure connection...<br>
+  Bypassing encryption...<br>
+  Accessing device storage...<br>
+</div>
+
+<div class="bar-container"><div class="bar"></div></div>
+
+<div class="glitch">
+  📍 Location tracking enabled<br>
+  🎤 Microphone access granted<br>
+  📷 Camera access granted<br>
+  📡 Uploading personal data...
+</div>
+
+<div class="warning">DO NOT TURN OFF YOUR DEVICE</div>
+
+</body>
+</html>
