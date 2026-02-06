@@ -29,7 +29,7 @@
     background:#fff;
     opacity:0;
     pointer-events:none;
-    z-index:9999;
+    z-index:99999;
     transition: opacity .06s linear;
   }
 
@@ -39,7 +39,7 @@
     background: radial-gradient(ellipse at center, rgba(255,0,51,.18), rgba(0,0,0,.88) 65%);
     opacity:0;
     pointer-events:none;
-    z-index:9000;
+    z-index:90000;
     transition: opacity .2s ease;
   }
 
@@ -50,7 +50,7 @@
     filter: saturate(1.06) contrast(1.10);
   }
 
-  /* Big header (no clock/sig) */
+  /* Top bar (no clock/sig) */
   .top{
     display:flex; align-items:center; justify-content:space-between;
     gap:10px;
@@ -124,6 +124,8 @@
     display:flex; align-items:center; justify-content:space-between;
     gap:10px;
     margin-bottom:10px;
+    position: relative;
+    z-index: 1;
   }
   .title h2{
     margin:0;
@@ -141,7 +143,7 @@
 
   /* Log area */
   #log{
-    height: 52vh;
+    height: 46vh;
     overflow:hidden;
     border-radius: 14px;
     border:1px solid rgba(0,255,102,.16);
@@ -162,6 +164,7 @@
   }
   .dim{ color: rgba(0,255,102,.62); }
   .warn{ color: rgba(255,0,51,.95); text-shadow: 0 0 14px rgba(255,0,51,.2); }
+  .cyan{ color: rgba(0,200,255,.85); text-shadow: 0 0 14px rgba(0,200,255,.18); }
 
   /* Progress bars */
   .bars{
@@ -227,14 +230,14 @@
   #popLayer{
     position:fixed; inset:0;
     pointer-events:none;
-    z-index: 8000;
+    z-index: 80000;
   }
   .pop{
     position:absolute;
-    width: min(280px, 80vw);
+    width: min(290px, 84vw);
     border-radius: 14px;
     border:1px solid rgba(0,255,102,.26);
-    background: rgba(0,0,0,.76);
+    background: rgba(0,0,0,.78);
     box-shadow: 0 12px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(0,255,102,.08);
     overflow:hidden;
     pointer-events:auto;
@@ -287,26 +290,28 @@
     background: radial-gradient(ellipse at center, rgba(255,0,51,.16), rgba(0,0,0,.92) 60%);
     opacity:0;
     pointer-events:none;
-    z-index: 9500;
+    z-index: 95000;
     transition: opacity .25s ease;
     text-align:center;
     padding: 18px;
   }
   #epic .stack{
-    width:min(820px, 96vw);
+    width:min(860px, 96vw);
     border-radius: 24px;
     border: 1px solid rgba(255,0,51,.38);
-    background: rgba(0,0,0,.70);
+    background: rgba(0,0,0,.72);
     box-shadow: 0 0 0 1px rgba(255,0,51,.12), 0 30px 90px rgba(0,0,0,.65);
     padding: 18px 16px;
+    position: relative;
+    overflow: hidden;
   }
   #epic .big{
-    font-size: clamp(22px, 6vw, 44px);
+    font-size: clamp(22px, 6vw, 46px);
     letter-spacing: .14em;
     text-transform: uppercase;
     color: rgba(255,0,51,.95);
     text-shadow: 0 0 18px rgba(255,0,51,.22);
-    margin: 0 0 12px;
+    margin: 0 0 10px;
   }
   #epic .sub{
     font-size: 13px;
@@ -317,12 +322,52 @@
   }
   #epic .scan{
     font-size: 12px;
-    color: rgba(0,255,102,.66);
+    color: rgba(0,255,102,.68);
     letter-spacing: .08em;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
-  /* Small “tap” helper (non-blocking) */
+  /* Fake front camera preview (animated noise) */
+  #camBox{
+    margin: 14px auto 0;
+    width: min(360px, 88vw);
+    aspect-ratio: 4/3;
+    border-radius: 18px;
+    border: 1px solid rgba(0,255,102,.25);
+    overflow:hidden;
+    position: relative;
+    background: rgba(0,0,0,.6);
+    box-shadow: inset 0 0 0 1px rgba(0,255,102,.08);
+  }
+  #camCanvas{ width:100%; height:100%; display:block; }
+  #camHud{
+    position:absolute; inset:0;
+    pointer-events:none;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding: 10px 10px;
+  }
+  .hudRow{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(0,255,102,.75);
+    text-shadow: 0 0 12px rgba(0,255,102,.16);
+  }
+  .rec{
+    display:inline-flex; align-items:center; gap:8px;
+    color: rgba(255,0,51,.95);
+  }
+  .recDot{
+    width:8px; height:8px; border-radius:999px;
+    background: rgba(255,0,51,.95);
+    box-shadow: 0 0 10px rgba(255,0,51,.5);
+    animation: blink .9s infinite;
+  }
+
+  /* Big “tap” helper (non-blocking) */
   #tapHint{
     position: fixed;
     left: 12px; right: 12px;
@@ -340,6 +385,78 @@
     pointer-events:none;
     opacity: .88;
   }
+
+  /* Final fake lock screen overlay */
+  #lock{
+    position:fixed; inset:0;
+    display:none;
+    z-index: 999999;
+    background: radial-gradient(ellipse at center, rgba(0,255,102,.06), rgba(0,0,0,.96) 60%);
+    color: var(--g);
+    padding: 18px;
+  }
+  #lock .card{
+    width: min(520px, 94vw);
+    margin: 0 auto;
+    border-radius: 22px;
+    border:1px solid rgba(0,255,102,.24);
+    background: rgba(0,0,0,.72);
+    box-shadow: 0 0 0 1px rgba(0,255,102,.08), 0 30px 90px rgba(0,0,0,.7);
+    padding: 18px 16px;
+    text-align:center;
+    position: relative;
+    top: 14vh;
+  }
+  #lock .h{
+    font-size: 18px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(255,0,51,.95);
+    margin: 0 0 10px;
+  }
+  #lock .p{
+    font-size: 12px;
+    letter-spacing: .10em;
+    line-height: 1.55;
+    color: rgba(0,255,102,.74);
+    text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+  #lock .pin{
+    width: min(320px, 86vw);
+    margin: 12px auto 0;
+    display:flex;
+    gap: 10px;
+    justify-content:center;
+  }
+  #lock input{
+    width: 100%;
+    padding: 14px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(0,255,102,.22);
+    background: rgba(0,0,0,.55);
+    color: rgba(0,255,102,.9);
+    letter-spacing: .18em;
+    text-align:center;
+    font-size: 14px;
+    outline: none;
+  }
+  #lock .err{
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(255,0,51,.92);
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  #lock .code{
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: .14em;
+    color: rgba(0,255,102,.55);
+    text-transform: uppercase;
+  }
 </style>
 </head>
 <body>
@@ -348,7 +465,7 @@
 <div id="redalert"></div>
 <div id="popLayer"></div>
 
-<div id="epic">
+<div id="epic" aria-hidden="true">
   <div class="stack">
     <p class="big">SYSTEM BREACH COMPLETE</p>
     <p class="sub">REMOTE OPERATOR: CONNECTED</p>
@@ -358,6 +475,20 @@
       Live capture: ACTIVE<br><br>
       <span style="color:rgba(255,0,51,.95);font-weight:900;">DO NOT POWER OFF</span>
     </p>
+
+    <div id="camBox" aria-hidden="true">
+      <canvas id="camCanvas"></canvas>
+      <div id="camHud">
+        <div class="hudRow">
+          <span class="rec"><span class="recDot"></span> REC</span>
+          <span id="camTime">00:00</span>
+        </div>
+        <div class="hudRow">
+          <span id="gpsHud">GPS: ---.------, ---.------</span>
+          <span>FRONT</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -401,10 +532,29 @@
 
 <div id="tapHint">sound + fullscreen triggers on first tap</div>
 
+<!-- Fake lock screen -->
+<div id="lock" aria-hidden="true">
+  <div class="card">
+    <p class="h">DEVICE LOCKED</p>
+    <p class="p">
+      Remote security protocol enabled<br>
+      Recovery key required to regain access
+    </p>
+
+    <div class="pin">
+      <input id="pinInput" inputmode="numeric" placeholder="ENTER RECOVERY KEY" maxlength="10" />
+    </div>
+
+    <div class="err" id="pinErr">INVALID KEY — ACCESS DENIED</div>
+    <div class="code">ERROR CODE: 0xDEADFACE</div>
+  </div>
+</div>
+
 <script>
-  // NOTE: Browsers block auto-audio/fullscreen without a user gesture.
-  // This page starts immediately (logs, popups, flashes), then the *first tap anywhere*
-  // unlocks the extra chaos (fullscreen + sound + vibration).
+  // IMPORTANT:
+  // - Browsers block auto-audio/fullscreen without a user gesture.
+  // - This page starts immediately with visuals + logs + popups.
+  // - First tap anywhere unlocks sound + (attempt) fullscreen + vibration.
 
   const $ = (id)=>document.getElementById(id);
   const logEl = $("log");
@@ -413,14 +563,15 @@
   const popLayer = $("popLayer");
   const panel = $("panel");
   const epic = $("epic");
+  const lock = $("lock");
 
-  // --------- Visual helpers ----------
+  // --------- Helpers ----------
   function addLine(text, cls=""){
     const d = document.createElement("div");
     d.className = "line " + cls;
     d.textContent = text;
     logEl.appendChild(d);
-    while(logEl.childNodes.length > 22) logEl.removeChild(logEl.firstChild);
+    while(logEl.childNodes.length > 24) logEl.removeChild(logEl.firstChild);
   }
 
   function flash(times=2){
@@ -438,18 +589,7 @@
     try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
   }
 
-  function glitchBurst(){
-    panel.classList.add("shake");
-    redEl.style.opacity="1";
-    flash(3);
-    vibrate([60,40,60,40,120]);
-    beep(1200, 0.06, "square", 0.14);
-    beep(240, 0.18, "sawtooth", 0.12);
-    setTimeout(()=>panel.classList.remove("shake"), 700);
-    setTimeout(()=>redEl.style.opacity="0", 900);
-  }
-
-  // --------- WebAudio (only works after first tap) ----------
+  // --------- WebAudio (only after tap) ----------
   let audioCtx, masterGain;
   function initAudio(){
     if(audioCtx) return;
@@ -474,7 +614,6 @@
     o.stop(t+dur+0.02);
   }
 
-  let sirenStop = null;
   function startSiren(ms=2400){
     if(!audioCtx) return;
     const o = audioCtx.createOscillator();
@@ -496,7 +635,7 @@
     step();
     const int = setInterval(step, 240);
 
-    sirenStop = setTimeout(()=>{
+    setTimeout(()=>{
       clearInterval(int);
       const t = audioCtx.currentTime;
       g.gain.exponentialRampToValueAtTime(0.0001, t+0.1);
@@ -504,19 +643,32 @@
     }, ms);
   }
 
-  // --------- Fake popup windows ----------
+  function glitchBurst(){
+    panel.classList.add("shake");
+    redEl.style.opacity="1";
+    flash(3);
+    vibrate([60,40,60,40,120]);
+    beep(1200, 0.06, "square", 0.14);
+    beep(240, 0.18, "sawtooth", 0.12);
+    setTimeout(()=>panel.classList.remove("shake"), 700);
+    setTimeout(()=>redEl.style.opacity="0", 900);
+  }
+
+  // --------- Fake popups ----------
   const popTitles = [
     "SECURITY WARNING", "KERNEL ALERT", "REMOTE ACCESS", "PERMISSION GRANT",
-    "DEVICE ADMIN", "DATA LOSS", "ENCRYPTION ERROR", "SYSTEM POLICY", "FIREWALL"
+    "DEVICE ADMIN", "DATA LOSS", "ENCRYPTION ERROR", "SYSTEM POLICY", "FIREWALL",
+    "TOR EXIT NODE", "PAYLOAD STAGE", "SESSION HIJACK"
   ];
   const popBodies = [
     `Unauthorized session detected.<br><span class="bad">Action required</span>.`,
-    `Device integrity compromised.<br><span class="bad">Root escalation</span>.`,
+    `Device integrity compromised.<br><span class="bad">Privilege escalation</span>.`,
     `Permission injected: CAMERA / MIC.<br><span class="bad">Approved</span>.`,
     `Memory dump started…<br><span class="bad">Do not power off</span>.`,
     `Location stream mirrored.<br><span class="bad">Live tracking</span>.`,
     `Contacts indexed…<br><span class="bad">Export queued</span>.`,
-    `System settings overridden.<br><span class="bad">Lock disabled</span>.`
+    `System settings overridden.<br><span class="bad">Policy replaced</span>.`,
+    `Proxy chain online.<br><span class="bad">Routing via TOR</span>.`
   ];
 
   function spawnPopup(){
@@ -537,30 +689,25 @@
       <div class="body">${body}</div>
     `;
 
-    // Close button runs away / multiplies the chaos
     const x = p.querySelector(".x");
+
     x.addEventListener("pointerenter", ()=>{
-      // hop position
       p.style.left = (8 + Math.random()*84) + "vw";
       p.style.top  = (10 + Math.random()*76) + "vh";
       p.style.transform = `translate(-50%,-50%) rotate(${(Math.random()*2-1)*2}deg) scale(${0.98 + Math.random()*0.06})`;
-      // sometimes duplicate
-      if(Math.random() < 0.35 && popLayer.childNodes.length < 18){
-        spawnPopup();
-      }
+      if(Math.random() < 0.35 && popLayer.childNodes.length < 22) spawnPopup();
       if(Math.random() < 0.22) flash(1);
       if(Math.random() < 0.18) glitchBurst();
     });
 
-    // Clicking X just makes it worse 😈
     x.addEventListener("click", (e)=>{
       e.stopPropagation();
-      if(popLayer.childNodes.length < 22){
+      if(popLayer.childNodes.length < 28){
         spawnPopup(); spawnPopup();
       }
       addLine("⚠ WINDOW CLOSE BLOCKED (POLICY)", "warn");
-      if(Math.random() < 0.7) flash(2);
-      if(Math.random() < 0.55) glitchBurst();
+      flash(2);
+      if(Math.random() < 0.6) glitchBurst();
     });
 
     popLayer.appendChild(p);
@@ -571,7 +718,6 @@
     const t = setInterval(()=>{
       spawnPopup();
       made++;
-      // tiny flicker
       if(Math.random() < 0.25) flash(1);
       if(made >= count) clearInterval(t);
     }, interval);
@@ -605,6 +751,102 @@
     tick();
   }
 
+  // --------- Fake GPS ----------
+  function randomCoord(){
+    // UK-ish plausible range (just for drama; not real)
+    const lat = (51.0 + Math.random()*2.2).toFixed(6);
+    const lon = (-0.6 - Math.random()*2.0).toFixed(6);
+    return { lat, lon };
+  }
+  let gps = randomCoord();
+  function updateGpsHud(){
+    const el = $("gpsHud");
+    if(!el) return;
+    el.textContent = `GPS: ${gps.lat}, ${gps.lon}`;
+  }
+
+  // --------- Fake front camera preview (animated noise) ----------
+  let camCanvas, camCtx, camT = 0, camTimer = null;
+  function startFakeCam(){
+    camCanvas = $("camCanvas");
+    if(!camCanvas) return;
+    camCtx = camCanvas.getContext("2d", { alpha:false });
+
+    const resize = ()=>{
+      const box = camCanvas.parentElement.getBoundingClientRect();
+      camCanvas.width = Math.floor(box.width);
+      camCanvas.height = Math.floor(box.height);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const start = performance.now();
+    const draw = (now)=>{
+      camT = (now - start)/1000;
+
+      const w = camCanvas.width, h = camCanvas.height;
+      const img = camCtx.createImageData(w, h);
+      const d = img.data;
+
+      // Noise + faint "face blob" to feel like a cam feed
+      const cx = w*0.5 + Math.sin(camT*0.7)*w*0.03;
+      const cy = h*0.48 + Math.cos(camT*0.6)*h*0.03;
+      const rx = w*0.22, ry = h*0.28;
+
+      for(let i=0;i<d.length;i+=4){
+        const px = ((i/4)%w);
+        const py = Math.floor((i/4)/w);
+
+        let n = (Math.random()*255)|0;
+        // Scanline wobble
+        n = (n*0.35 + (Math.sin((py/6)+camT*10)*42 + 80))|0;
+
+        // Face-ish ellipse shadow
+        const dx = (px - cx)/rx;
+        const dy = (py - cy)/ry;
+        const inside = (dx*dx + dy*dy) < 1.0;
+
+        let g = n;
+        let r = n*0.35;
+        let b = n*0.55;
+
+        if(inside){
+          g = g*0.75;
+          r = r*0.55;
+          b = b*0.65;
+        }
+
+        // Green tint and contrast
+        d[i]   = Math.max(0, Math.min(255, r));      // R
+        d[i+1] = Math.max(0, Math.min(255, g));      // G
+        d[i+2] = Math.max(0, Math.min(255, b));      // B
+        d[i+3] = 255;
+      }
+
+      camCtx.putImageData(img, 0, 0);
+
+      // HUD timer
+      const t = Math.floor(camT);
+      const mm = String(Math.floor(t/60)).padStart(2,"0");
+      const ss = String(t%60).padStart(2,"0");
+      const ct = $("camTime");
+      if(ct) ct.textContent = `${mm}:${ss}`;
+
+      // slight GPS drift
+      if(t % 2 === 0 && Math.random()<0.12){
+        gps = {
+          lat: (parseFloat(gps.lat) + (Math.random()*0.0003)).toFixed(6),
+          lon: (parseFloat(gps.lon) + (Math.random()*0.0003)).toFixed(6)
+        };
+        updateGpsHud();
+      }
+
+      camTimer = requestAnimationFrame(draw);
+    };
+    updateGpsHud();
+    camTimer = requestAnimationFrame(draw);
+  }
+
   // --------- Main sequence (runs immediately) ----------
   function startImmediate(){
     addLine("BOOT: kernel stream attached", "dim");
@@ -614,27 +856,30 @@
 
     runBars();
 
-    // Start with a few popups straight away (no click needed)
     setTimeout(()=>popupStorm(6, 160), 650);
     setTimeout(()=>popupStorm(8, 120), 1800);
 
     const steps = [
-      { t: 450,  msg: "Initializing handshake…", cls:"dim", fx: ()=>{} },
-      { t: 900,  msg: "Negotiating secure tunnel…", cls:"dim", fx: ()=>{} },
-      { t: 1350, msg: "Bypassing lockscreen policy…", cls:"",   fx: ()=>{ if(Math.random()<0.5) flash(1);} },
-      { t: 1850, msg: "Permission grant: 📍 LOCATION", cls:"warn", fx: ()=>{ glitchBurst(); } },
-      { t: 2350, msg: "Permission grant: 🎤 MICROPHONE", cls:"warn", fx: ()=>{ flash(2); } },
-      { t: 2850, msg: "Permission grant: 📷 CAMERA", cls:"warn", fx: ()=>{ flash(2); } },
-      { t: 3350, msg: "Scraping contacts…", cls:"", fx: ()=>{} },
-      { t: 3850, msg: "Mirroring notifications…", cls:"", fx: ()=>{} },
-      { t: 4350, msg: "Indexing media library…", cls:"", fx: ()=>{} },
+      { t: 450,  msg: "Initializing handshake…", cls:"dim" },
+      { t: 900,  msg: "Negotiating secure tunnel…", cls:"dim" },
+      { t: 1350, msg: "Bypassing lockscreen policy…", cls:"" },
+      { t: 1850, msg: "Permission grant: 📍 LOCATION", cls:"warn", fx: ()=>glitchBurst() },
+      { t: 2350, msg: "Permission grant: 🎤 MICROPHONE", cls:"warn", fx: ()=>flash(2) },
+      { t: 2850, msg: "Permission grant: 📷 CAMERA", cls:"warn", fx: ()=>flash(2) },
+      { t: 3350, msg: "Scraping contacts…", cls:"" },
+      { t: 3850, msg: "Mirroring notifications…", cls:"" },
+      { t: 4350, msg: "Indexing media library…", cls:"" },
       { t: 5050, msg: "⚠ DATA EXFILTRATION IN PROGRESS", cls:"warn", fx: ()=>{ redEl.style.opacity="1"; setTimeout(()=>redEl.style.opacity="0",900);} },
-      { t: 5850, msg: "Finalizing…", cls:"dim", fx: ()=>{} },
+      { t: 5850, msg: "Finalizing…", cls:"dim" },
       { t: 6900, msg: "REMOTE SESSION: ACTIVE", cls:"warn", fx: ()=>{ $("threat").textContent="THREAT: CONFIRMED"; glitchBurst(); } },
     ];
-    steps.forEach(s=>setTimeout(()=>{ addLine(s.msg, s.cls); try{s.fx&&s.fx();}catch(e){} }, s.t));
+    steps.forEach(s=>setTimeout(()=>{
+      addLine(s.msg, s.cls);
+      if(s.fx) try{s.fx();}catch(e){}
+      if(audioCtx && Math.random()<0.25) beep(700+Math.random()*700, 0.05, "square", 0.09);
+    }, s.t));
 
-    // Keep spitting “live” messages
+    // Live spam
     setTimeout(()=>{
       $("footerWarn").textContent = "REMOTE OPERATOR CONNECTED";
       let count=0;
@@ -643,7 +888,7 @@
         const pool = [
           ["PING: keepalive", "dim"],
           ["STREAM: mic buffer opened", ""],
-          ["GPS: updated coordinates pushed", ""],
+          [`GPS: ${gps.lat}, ${gps.lon}`, "cyan"],
           ["CAM: frame captured", ""],
           ["SYNC: messages indexed", ""],
           ["⚠ POLICY VIOLATION DETECTED", "warn"],
@@ -653,24 +898,22 @@
         addLine(pick[0], pick[1]);
         if(Math.random()<0.10) flash(1);
         if(Math.random()<0.08) glitchBurst();
+        if(audioCtx && Math.random()<0.22) beep(900 + Math.random()*700, 0.05, "square", 0.09);
         if(count>34) clearInterval(spam);
       }, 260);
     }, 7600);
 
-    // Epic finish
+    // Epic finish, then “files/images/dark web”, then lock screen
     setTimeout(()=>epicFinish(), 9800);
   }
 
   function epicFinish(){
-    // Make it feel like it “breaks” then fully takes over
     $("threat").textContent = "THREAT: CRITICAL";
     addLine("⚠ SYSTEM OVERRIDE: ENABLED", "warn");
     addLine("⚠ LOCKOUT: DISABLED", "warn");
 
-    // Huge popup storm
     popupStorm(14, 90);
 
-    // Glitch crescendo
     let bursts = 0;
     const crescendo = setInterval(()=>{
       bursts++;
@@ -681,21 +924,177 @@
       if(bursts >= 6) clearInterval(crescendo);
     }, 240);
 
-    // Final takeover overlay
+    // Show epic overlay
     setTimeout(()=>{
       epic.style.opacity="1";
+      epic.setAttribute("aria-hidden","false");
       redEl.style.opacity="1";
       flash(4);
       vibrate([160,80,160,80,240,120,240]);
       if(audioCtx){
-        // stinger
         beep(180,0.18,"sawtooth",0.16);
         beep(880,0.10,"square",0.14);
         beep(1320,0.08,"square",0.14);
         startSiren(1700);
       }
       setTimeout(()=>redEl.style.opacity="0", 1300);
+
+      // Start fake cam preview once the overlay is visible
+      startFakeCam();
+
+      // Continue story AFTER breach
+      setTimeout(()=>fileChaosSequence(), 2400);
     }, 1800);
+  }
+
+  // --------- Phase 2: files / images / upload / “dark web” / delete ----------
+  function fileChaosSequence(){
+    addLine("POST-BREACH: enumerating filesystem…", "dim");
+    $("footerWarn").textContent = "FILE INDEX: IN PROGRESS";
+
+    const files = [
+      "DCIM/Camera/IMG_4921.jpg",
+      "DCIM/Camera/VID_1042.mp4",
+      "Pictures/Screenshots/IMG_7721.png",
+      "WhatsApp Images/IMG-20240214.jpg",
+      "Downloads/receipt.pdf",
+      "Downloads/notes.txt",
+      "Telegram Images/IMG_0198.jpg",
+      "Gallery/Favorites/IMG_0007.jpg",
+      "Documents/Passwords.txt",
+      "Hidden/.vault/media_001.jpg",
+      "Hidden/.vault/media_002.jpg",
+      "Movies/Clips/clip_03.mp4"
+    ];
+
+    let i = 0;
+    const scan = setInterval(()=>{
+      if(i >= files.length){
+        clearInterval(scan);
+        addLine("Index complete: 12 items flagged as SENSITIVE", "warn");
+        addLine(`GPS lock acquired: ${gps.lat}, ${gps.lon}`, "cyan");
+        setTimeout(()=>darkWebPhase(), 700);
+        return;
+      }
+      addLine("📁 Scanning: " + files[i], "");
+      if(Math.random()<0.35) flash(1);
+      if(audioCtx && Math.random()<0.18) beep(650+Math.random()*500, 0.05, "square", 0.08);
+      i++;
+    }, 520);
+  }
+
+  function darkWebPhase(){
+    addLine("Routing exfiltration channel via TOR…", "warn");
+    addLine("📡 Exit node handshake: OK", "dim");
+    addLine("🧬 Packaging media archive: media_dump.tar", "dim");
+    addLine("⚠ Upload destination: dark-web mirror", "warn");
+    $("footerWarn").textContent = "DARK WEB MIRROR: CONNECTED";
+    if(audioCtx) startSiren(1200);
+    flash(2);
+    vibrate([80,60,80]);
+
+    setTimeout(()=>uploadPhase(), 900);
+  }
+
+  function uploadPhase(){
+    addLine("⬆ Uploading discovered media…", "warn");
+    $("threat").textContent = "THREAT: EXFILTRATION";
+    $("footerWarn").textContent = "MEDIA EXFILTRATION IN PROGRESS";
+
+    let percent = 0;
+    const up = setInterval(()=>{
+      percent += Math.floor(Math.random()*16)+6;
+      if(percent >= 100){
+        percent = 100;
+        addLine("Upload progress: 100% (mirror synced)", "warn");
+        clearInterval(up);
+        setTimeout(()=>deletePhase(), 850);
+        return;
+      }
+      addLine("Upload progress: " + percent + "%", percent > 70 ? "warn" : "");
+      if(audioCtx) beep(600+Math.random()*400, 0.05, "square", 0.10);
+      if(Math.random()<0.18) flash(1);
+    }, 420);
+  }
+
+  function deletePhase(){
+    addLine("🗑 Removing local copies…", "warn");
+    $("threat").textContent = "THREAT: DATA LOSS";
+    $("footerWarn").textContent = "LOCAL DATA: PURGE";
+
+    const msgs = [
+      "Deleting DCIM/Camera/IMG_4921.jpg…",
+      "Deleting Hidden/.vault/media_001.jpg…",
+      "Deleting Hidden/.vault/media_002.jpg…",
+      "Clearing Recent Items…",
+      "Wiping thumbnails cache…",
+      "Emptying trash…",
+      "Overwriting free space…"
+    ];
+
+    let i = 0;
+    const del = setInterval(()=>{
+      if(i >= msgs.length){
+        clearInterval(del);
+        addLine("Purge complete. Recovery: DISABLED", "warn");
+        setTimeout(()=>lockScreenPhase(), 1500);
+        return;
+      }
+      addLine(msgs[i], "warn");
+      glitchBurst();
+      if(audioCtx && Math.random()<0.55) beep(980+Math.random()*700, 0.05, "square", 0.11);
+      i++;
+    }, 780);
+  }
+
+  // --------- Final lock screen ----------
+  function lockScreenPhase(){
+    // Slow, dramatic, not instant
+    addLine("⚠ REMOTE ENFORCEMENT: ENABLED", "warn");
+    addLine("Applying device lock policy…", "dim");
+    $("footerWarn").textContent = "ENFORCING LOCKDOWN";
+
+    setTimeout(()=>{
+      lock.style.display = "block";
+      lock.setAttribute("aria-hidden","false");
+      flash(3);
+      redEl.style.opacity="1";
+      setTimeout(()=>redEl.style.opacity="0", 900);
+      vibrate([200,100,200,100,300]);
+      if(audioCtx){
+        startSiren(1800);
+        beep(200,0.2,"sawtooth",0.2);
+      }
+
+      // Make the “PIN” always fail (harmless)
+      const pin = $("pinInput");
+      const err = $("pinErr");
+      const fail = ()=>{
+        if(err) err.style.opacity = "1";
+        if(audioCtx) beep(1400,0.06,"square",0.12);
+        setTimeout(()=>{ if(err) err.style.opacity = "0"; }, 700);
+        if(pin) pin.value = "";
+      };
+      if(pin){
+        pin.addEventListener("keydown", (e)=>{
+          if(e.key === "Enter") fail();
+        });
+        pin.addEventListener("input", ()=>{
+          if(pin.value.length >= 4) fail();
+        });
+      }
+
+      // Keep it twitchy
+      let ticks = 0;
+      const twitch = setInterval(()=>{
+        ticks++;
+        if(Math.random()<0.35) flash(1);
+        if(Math.random()<0.25) vibrate([40,30,40]);
+        if(audioCtx && Math.random()<0.25) beep(900+Math.random()*700, 0.05, "square", 0.09);
+        if(ticks > 16) clearInterval(twitch);
+      }, 340);
+
+    }, 2400);
   }
 
   // --------- First tap unlocks fullscreen + sound ----------
@@ -703,10 +1102,14 @@
   async function armOnFirstTap(){
     if(armed) return;
     armed = true;
-    $("tapHint").style.opacity = "0";
-    setTimeout(()=>{ try{$("tapHint").remove();}catch(e){} }, 220);
 
-    // Try fullscreen (best effort)
+    const hint = $("tapHint");
+    if(hint){
+      hint.style.opacity = "0";
+      setTimeout(()=>{ try{hint.remove();}catch(e){} }, 220);
+    }
+
+    // Fullscreen (best effort)
     try{
       const el = document.documentElement;
       if(el.requestFullscreen) await el.requestFullscreen();
@@ -717,7 +1120,6 @@
     initAudio();
     try{ await audioCtx.resume(); }catch(e){}
 
-    // Immediate “oh no” moment after the tap
     flash(3);
     redEl.style.opacity="1";
     setTimeout(()=>redEl.style.opacity="0", 650);
@@ -742,6 +1144,7 @@
   }, {passive:true});
 
   // Start NOW (no welcome screen)
+  updateGpsHud();
   startImmediate();
 </script>
 </body>
