@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#000000" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <title>System Alert</title>
 <style>
   :root{
@@ -21,6 +23,12 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
     overflow:hidden;
     user-select:none;
+  }
+
+  /* Best-effort "immersive" */
+  body.fullscreen-ish{
+    overscroll-behavior: none;
+    touch-action: manipulation;
   }
 
   /* Screen flash */
@@ -50,7 +58,7 @@
     filter: saturate(1.06) contrast(1.10);
   }
 
-  /* Top bar (no clock/sig) */
+  /* Top bar */
   .top{
     display:flex; align-items:center; justify-content:space-between;
     gap:10px;
@@ -226,7 +234,7 @@
     100%{ transform: translate(0,0) rotate(0deg); }
   }
 
-  /* FAKE POPUP WINDOWS */
+  /* Fake popups */
   #popLayer{
     position:fixed; inset:0;
     pointer-events:none;
@@ -269,7 +277,6 @@
     line-height: 1;
     cursor: pointer;
     display:flex; align-items:center; justify-content:center;
-    transition: transform .08s ease;
   }
   .pop .body{
     padding: 10px;
@@ -283,7 +290,7 @@
     font-weight: 800;
   }
 
-  /* EPIC TAKEOVER */
+  /* EPIC overlay */
   #epic{
     position:fixed; inset:0;
     display:flex; align-items:center; justify-content:center;
@@ -296,7 +303,7 @@
     padding: 18px;
   }
   #epic .stack{
-    width:min(860px, 96vw);
+    width:min(900px, 96vw);
     border-radius: 24px;
     border: 1px solid rgba(255,0,51,.38);
     background: rgba(0,0,0,.72);
@@ -318,18 +325,34 @@
     letter-spacing: .10em;
     color: rgba(0,255,102,.78);
     text-transform: uppercase;
-    margin: 0 0 14px;
+    margin: 0 0 12px;
   }
-  #epic .scan{
+  #epicFeed{
+    margin: 10px auto 0;
+    width: min(720px, 92vw);
+    max-height: 22vh;
+    overflow:hidden;
+    border-radius: 16px;
+    border:1px solid rgba(0,255,102,.18);
+    background: rgba(0,0,0,.45);
+    padding: 10px 10px;
+    text-align:left;
+  }
+  .feedLine{
     font-size: 12px;
-    color: rgba(0,255,102,.68);
     letter-spacing: .08em;
-    line-height: 1.5;
+    line-height: 1.45;
+    text-transform: uppercase;
+    color: rgba(0,255,102,.75);
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
   }
+  .feedWarn{ color: rgba(255,0,51,.95); font-weight: 900; }
 
-  /* Fake front camera preview (animated noise) */
+  /* Fake cam preview */
   #camBox{
-    margin: 14px auto 0;
+    margin: 12px auto 0;
     width: min(360px, 88vw);
     aspect-ratio: 4/3;
     border-radius: 18px;
@@ -367,7 +390,7 @@
     animation: blink .9s infinite;
   }
 
-  /* Big “tap” helper (non-blocking) */
+  /* Hint */
   #tapHint{
     position: fixed;
     left: 12px; right: 12px;
@@ -386,7 +409,7 @@
     opacity: .88;
   }
 
-  /* Final fake lock screen overlay */
+  /* Final lock */
   #lock{
     position:fixed; inset:0;
     display:none;
@@ -422,15 +445,8 @@
     text-transform: uppercase;
     margin: 0 0 14px;
   }
-  #lock .pin{
-    width: min(320px, 86vw);
-    margin: 12px auto 0;
-    display:flex;
-    gap: 10px;
-    justify-content:center;
-  }
   #lock input{
-    width: 100%;
+    width: min(320px, 86vw);
     padding: 14px 14px;
     border-radius: 14px;
     border: 1px solid rgba(0,255,102,.22);
@@ -457,6 +473,60 @@
     color: rgba(0,255,102,.55);
     text-transform: uppercase;
   }
+
+  /* Final Rick Roll stage */
+  #final{
+    position:fixed; inset:0;
+    display:none;
+    z-index: 999990;
+    background: #000;
+    color: #fff;
+    padding: 16px;
+  }
+  #final .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    text-align:center;
+    padding-top: 10vh;
+  }
+  #final h1{
+    margin:0 0 10px;
+    font-size: 22px;
+    letter-spacing:.12em;
+    text-transform: uppercase;
+    color: var(--g);
+    font-family: inherit;
+  }
+  #final p{
+    margin: 0 0 14px;
+    opacity: .8;
+    font-size: 13px;
+    letter-spacing:.08em;
+    text-transform: uppercase;
+    font-family: inherit;
+  }
+  #final .btn{
+    display:inline-block;
+    margin-top: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border:1px solid rgba(0,255,102,.35);
+    background: rgba(0,255,102,.10);
+    color: var(--g);
+    font-weight: 900;
+    letter-spacing:.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  #final iframe{
+    width: min(900px, 94vw);
+    aspect-ratio: 16/9;
+    border: 1px solid rgba(0,255,102,.25);
+    border-radius: 14px;
+    margin-top: 14px;
+    background:#000;
+  }
 </style>
 </head>
 <body>
@@ -468,13 +538,7 @@
 <div id="epic" aria-hidden="true">
   <div class="stack">
     <p class="big">SYSTEM BREACH COMPLETE</p>
-    <p class="sub">REMOTE OPERATOR: CONNECTED</p>
-    <p class="scan" id="epicText">
-      Exfiltration: 100%<br>
-      Mirrors: ENABLED<br>
-      Live capture: ACTIVE<br><br>
-      <span style="color:rgba(255,0,51,.95);font-weight:900;">DO NOT POWER OFF</span>
-    </p>
+    <p class="sub" id="epicSub">REMOTE OPERATOR: CONNECTED</p>
 
     <div id="camBox" aria-hidden="true">
       <canvas id="camCanvas"></canvas>
@@ -489,6 +553,8 @@
         </div>
       </div>
     </div>
+
+    <div id="epicFeed" aria-label="breach feed"></div>
   </div>
 </div>
 
@@ -530,9 +596,8 @@
   </div>
 </div>
 
-<div id="tapHint">sound + fullscreen triggers on first tap</div>
+<div id="tapHint">first tap unlocks fullscreen + sound (browser rule)</div>
 
-<!-- Fake lock screen -->
 <div id="lock" aria-hidden="true">
   <div class="card">
     <p class="h">DEVICE LOCKED</p>
@@ -540,22 +605,22 @@
       Remote security protocol enabled<br>
       Recovery key required to regain access
     </p>
-
-    <div class="pin">
-      <input id="pinInput" inputmode="numeric" placeholder="ENTER RECOVERY KEY" maxlength="10" />
-    </div>
-
+    <input id="pinInput" inputmode="numeric" placeholder="ENTER RECOVERY KEY" maxlength="10" />
     <div class="err" id="pinErr">INVALID KEY — ACCESS DENIED</div>
     <div class="code">ERROR CODE: 0xDEADFACE</div>
   </div>
 </div>
 
-<script>
-  // IMPORTANT:
-  // - Browsers block auto-audio/fullscreen without a user gesture.
-  // - This page starts immediately with visuals + logs + popups.
-  // - First tap anywhere unlocks sound + (attempt) fullscreen + vibration.
+<div id="final" aria-hidden="true">
+  <div class="wrap">
+    <h1>FINAL PAYLOAD DELIVERED</h1>
+    <p>tap to review “incident report”</p>
+    <button class="btn" id="playBtn">PLAY REPORT</button>
+    <div id="vidSlot"></div>
+  </div>
+</div>
 
+<script>
   const $ = (id)=>document.getElementById(id);
   const logEl = $("log");
   const flashEl = $("flash");
@@ -563,17 +628,32 @@
   const popLayer = $("popLayer");
   const panel = $("panel");
   const epic = $("epic");
+  const epicFeed = $("epicFeed");
   const lock = $("lock");
+  const final = $("final");
 
-  // --------- Helpers ----------
+  // ---------- Feed + log (triple-visibility) ----------
+  function addFeed(text, isWarn=false){
+    const d = document.createElement("div");
+    d.className = "feedLine" + (isWarn ? " feedWarn" : "");
+    d.textContent = text;
+    epicFeed.appendChild(d);
+    while(epicFeed.childNodes.length > 9) epicFeed.removeChild(epicFeed.firstChild);
+  }
+
   function addLine(text, cls=""){
     const d = document.createElement("div");
     d.className = "line " + cls;
     d.textContent = text;
     logEl.appendChild(d);
-    while(logEl.childNodes.length > 24) logEl.removeChild(logEl.firstChild);
+    while(logEl.childNodes.length > 26) logEl.removeChild(logEl.firstChild);
+
+    // Mirror key events into the epic feed so it's impossible to miss
+    const warn = cls.includes("warn");
+    if(epic.style.opacity === "1") addFeed(text, warn);
   }
 
+  // ---------- Visual helpers ----------
   function flash(times=2){
     let i=0;
     const go=()=>{
@@ -584,12 +664,11 @@
     };
     go();
   }
-
   function vibrate(pattern){
     try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
   }
 
-  // --------- WebAudio (only after tap) ----------
+  // ---------- WebAudio (after tap) ----------
   let audioCtx, masterGain;
   function initAudio(){
     if(audioCtx) return;
@@ -598,7 +677,6 @@
     masterGain.gain.value = 0.18;
     masterGain.connect(audioCtx.destination);
   }
-
   function beep(freq=880, dur=0.08, type="square", gain=0.12){
     if(!audioCtx) return;
     const o = audioCtx.createOscillator();
@@ -613,7 +691,6 @@
     o.start(t);
     o.stop(t+dur+0.02);
   }
-
   function startSiren(ms=2400){
     if(!audioCtx) return;
     const o = audioCtx.createOscillator();
@@ -654,24 +731,12 @@
     setTimeout(()=>redEl.style.opacity="0", 900);
   }
 
-  // --------- Fake popups ----------
+  // ---------- Fake popups ----------
   const popTitles = [
-    "SECURITY WARNING", "KERNEL ALERT", "REMOTE ACCESS", "PERMISSION GRANT",
-    "DEVICE ADMIN", "DATA LOSS", "ENCRYPTION ERROR", "SYSTEM POLICY", "FIREWALL",
-    "TOR EXIT NODE", "PAYLOAD STAGE", "SESSION HIJACK"
+    "SECURITY WARNING","KERNEL ALERT","REMOTE ACCESS","PERMISSION GRANT","DEVICE ADMIN",
+    "DATA LOSS","ENCRYPTION ERROR","SYSTEM POLICY","FIREWALL","TOR EXIT NODE","PAYLOAD STAGE","SESSION HIJACK"
   ];
-  const popBodies = [
-    `Unauthorized session detected.<br><span class="bad">Action required</span>.`,
-    `Device integrity compromised.<br><span class="bad">Privilege escalation</span>.`,
-    `Permission injected: CAMERA / MIC.<br><span class="bad">Approved</span>.`,
-    `Memory dump started…<br><span class="bad">Do not power off</span>.`,
-    `Location stream mirrored.<br><span class="bad">Live tracking</span>.`,
-    `Contacts indexed…<br><span class="bad">Export queued</span>.`,
-    `System settings overridden.<br><span class="bad">Policy replaced</span>.`,
-    `Proxy chain online.<br><span class="bad">Routing via TOR</span>.`
-  ];
-
-  function spawnPopup(){
+  function spawnPopup(customBody=null){
     const p = document.createElement("div");
     p.className = "pop";
     p.style.left = (8 + Math.random()*72) + "vw";
@@ -679,7 +744,13 @@
     p.style.transform = `translate(-50%,-50%) rotate(${(Math.random()*2-1)*1.2}deg)`;
 
     const title = popTitles[Math.floor(Math.random()*popTitles.length)];
-    const body  = popBodies[Math.floor(Math.random()*popBodies.length)];
+    const body = customBody || [
+      `Unauthorized session detected.<br><span class="bad">Action required</span>.`,
+      `Device integrity compromised.<br><span class="bad">Privilege escalation</span>.`,
+      `Proxy chain online.<br><span class="bad">Routing via TOR</span>.`,
+      `Indexing media…<br><span class="bad">Sensitive flags raised</span>.`,
+      `Exfil queue: ACTIVE.<br><span class="bad">Do not power off</span>.`
+    ][Math.floor(Math.random()*5)];
 
     p.innerHTML = `
       <div class="bar">
@@ -690,29 +761,23 @@
     `;
 
     const x = p.querySelector(".x");
-
     x.addEventListener("pointerenter", ()=>{
       p.style.left = (8 + Math.random()*84) + "vw";
       p.style.top  = (10 + Math.random()*76) + "vh";
-      p.style.transform = `translate(-50%,-50%) rotate(${(Math.random()*2-1)*2}deg) scale(${0.98 + Math.random()*0.06})`;
-      if(Math.random() < 0.35 && popLayer.childNodes.length < 22) spawnPopup();
       if(Math.random() < 0.22) flash(1);
       if(Math.random() < 0.18) glitchBurst();
+      if(Math.random() < 0.25 && popLayer.childNodes.length < 22) spawnPopup();
     });
-
     x.addEventListener("click", (e)=>{
       e.stopPropagation();
-      if(popLayer.childNodes.length < 28){
-        spawnPopup(); spawnPopup();
-      }
       addLine("⚠ WINDOW CLOSE BLOCKED (POLICY)", "warn");
       flash(2);
+      if(popLayer.childNodes.length < 26){ spawnPopup(); spawnPopup(); }
       if(Math.random() < 0.6) glitchBurst();
     });
 
     popLayer.appendChild(p);
   }
-
   function popupStorm(count=10, interval=140){
     let made = 0;
     const t = setInterval(()=>{
@@ -723,12 +788,11 @@
     }, interval);
   }
 
-  // --------- Progress bars ----------
+  // ---------- Progress bars ----------
   function runBars(){
     const b1=$("b1"), b2=$("b2"), b3=$("b3");
     const p1=$("p1"), p2=$("p2"), p3=$("p3");
     let a=0, b=0, c=0;
-
     const tick=()=>{
       a = Math.min(100, a + (Math.random()*6));
       b = Math.min(100, b + (Math.random()*7));
@@ -751,9 +815,9 @@
     tick();
   }
 
-  // --------- Fake GPS ----------
+  // ---------- Fake GPS ----------
   function randomCoord(){
-    // UK-ish plausible range (just for drama; not real)
+    // UK-ish plausible range
     const lat = (51.0 + Math.random()*2.2).toFixed(6);
     const lon = (-0.6 - Math.random()*2.0).toFixed(6);
     return { lat, lon };
@@ -761,11 +825,10 @@
   let gps = randomCoord();
   function updateGpsHud(){
     const el = $("gpsHud");
-    if(!el) return;
-    el.textContent = `GPS: ${gps.lat}, ${gps.lon}`;
+    if(el) el.textContent = `GPS: ${gps.lat}, ${gps.lon}`;
   }
 
-  // --------- Fake front camera preview (animated noise) ----------
+  // ---------- Fake camera preview ----------
   let camCanvas, camCtx, camT = 0, camTimer = null;
   function startFakeCam(){
     camCanvas = $("camCanvas");
@@ -783,12 +846,10 @@
     const start = performance.now();
     const draw = (now)=>{
       camT = (now - start)/1000;
-
       const w = camCanvas.width, h = camCanvas.height;
       const img = camCtx.createImageData(w, h);
       const d = img.data;
 
-      // Noise + faint "face blob" to feel like a cam feed
       const cx = w*0.5 + Math.sin(camT*0.7)*w*0.03;
       const cy = h*0.48 + Math.cos(camT*0.6)*h*0.03;
       const rx = w*0.22, ry = h*0.28;
@@ -796,12 +857,9 @@
       for(let i=0;i<d.length;i+=4){
         const px = ((i/4)%w);
         const py = Math.floor((i/4)/w);
-
         let n = (Math.random()*255)|0;
-        // Scanline wobble
         n = (n*0.35 + (Math.sin((py/6)+camT*10)*42 + 80))|0;
 
-        // Face-ish ellipse shadow
         const dx = (px - cx)/rx;
         const dy = (py - cy)/ry;
         const inside = (dx*dx + dy*dy) < 1.0;
@@ -809,30 +867,25 @@
         let g = n;
         let r = n*0.35;
         let b = n*0.55;
-
         if(inside){
           g = g*0.75;
           r = r*0.55;
           b = b*0.65;
         }
 
-        // Green tint and contrast
-        d[i]   = Math.max(0, Math.min(255, r));      // R
-        d[i+1] = Math.max(0, Math.min(255, g));      // G
-        d[i+2] = Math.max(0, Math.min(255, b));      // B
+        d[i]   = Math.max(0, Math.min(255, r));
+        d[i+1] = Math.max(0, Math.min(255, g));
+        d[i+2] = Math.max(0, Math.min(255, b));
         d[i+3] = 255;
       }
-
       camCtx.putImageData(img, 0, 0);
 
-      // HUD timer
       const t = Math.floor(camT);
       const mm = String(Math.floor(t/60)).padStart(2,"0");
       const ss = String(t%60).padStart(2,"0");
       const ct = $("camTime");
       if(ct) ct.textContent = `${mm}:${ss}`;
 
-      // slight GPS drift
       if(t % 2 === 0 && Math.random()<0.12){
         gps = {
           lat: (parseFloat(gps.lat) + (Math.random()*0.0003)).toFixed(6),
@@ -847,15 +900,15 @@
     camTimer = requestAnimationFrame(draw);
   }
 
-  // --------- Main sequence (runs immediately) ----------
+  // ---------- Main show ----------
   function startImmediate(){
+    updateGpsHud();
     addLine("BOOT: kernel stream attached", "dim");
     addLine("NET: wlan0 route verified", "dim");
     addLine("AUTH: token accepted", "dim");
     addLine("TRACE: passive telemetry started", "dim");
 
     runBars();
-
     setTimeout(()=>popupStorm(6, 160), 650);
     setTimeout(()=>popupStorm(8, 120), 1800);
 
@@ -879,7 +932,6 @@
       if(audioCtx && Math.random()<0.25) beep(700+Math.random()*700, 0.05, "square", 0.09);
     }, s.t));
 
-    // Live spam
     setTimeout(()=>{
       $("footerWarn").textContent = "REMOTE OPERATOR CONNECTED";
       let count=0;
@@ -899,11 +951,11 @@
         if(Math.random()<0.10) flash(1);
         if(Math.random()<0.08) glitchBurst();
         if(audioCtx && Math.random()<0.22) beep(900 + Math.random()*700, 0.05, "square", 0.09);
-        if(count>34) clearInterval(spam);
+        if(count>30) clearInterval(spam);
       }, 260);
     }, 7600);
 
-    // Epic finish, then “files/images/dark web”, then lock screen
+    // Epic finish -> file/showcase -> lock -> rickroll
     setTimeout(()=>epicFinish(), 9800);
   }
 
@@ -924,7 +976,6 @@
       if(bursts >= 6) clearInterval(crescendo);
     }, 240);
 
-    // Show epic overlay
     setTimeout(()=>{
       epic.style.opacity="1";
       epic.setAttribute("aria-hidden","false");
@@ -939,17 +990,20 @@
       }
       setTimeout(()=>redEl.style.opacity="0", 1300);
 
-      // Start fake cam preview once the overlay is visible
+      addFeed("EXFILTRATION: 100% (INITIAL)", true);
+      addFeed("NEXT: FILES / MEDIA / BACKUPS", false);
+
       startFakeCam();
 
-      // Continue story AFTER breach
-      setTimeout(()=>fileChaosSequence(), 2400);
-    }, 1800);
+      // Make files absolutely obvious:
+      setTimeout(()=>fileChaosSequence(), 1800);
+    }, 1600);
   }
 
-  // --------- Phase 2: files / images / upload / “dark web” / delete ----------
+  // ---------- Phase 2: Files / Upload / Delete (kept PG-13 wording) ----------
   function fileChaosSequence(){
     addLine("POST-BREACH: enumerating filesystem…", "dim");
+    addFeed("ENUMERATING FILESYSTEM…", false);
     $("footerWarn").textContent = "FILE INDEX: IN PROGRESS";
 
     const files = [
@@ -967,20 +1021,27 @@
       "Movies/Clips/clip_03.mp4"
     ];
 
+    // Add a couple popups that reference the same phase (so it’s impossible to miss)
+    spawnPopup(`File system scan started.<br><span class="bad">Media flagged</span>.`);
+    setTimeout(()=>spawnPopup(`Archive builder online.<br><span class="bad">Preparing upload</span>.`), 800);
+
     let i = 0;
     const scan = setInterval(()=>{
       if(i >= files.length){
         clearInterval(scan);
         addLine("Index complete: 12 items flagged as SENSITIVE", "warn");
         addLine(`GPS lock acquired: ${gps.lat}, ${gps.lon}`, "cyan");
-        setTimeout(()=>darkWebPhase(), 700);
+        addFeed("INDEX COMPLETE: 12 ITEMS FLAGGED", true);
+        addFeed(`GPS LOCK: ${gps.lat}, ${gps.lon}`, false);
+        setTimeout(()=>darkWebPhase(), 850);
         return;
       }
       addLine("📁 Scanning: " + files[i], "");
-      if(Math.random()<0.35) flash(1);
+      addFeed("SCAN: " + files[i], false);
+      if(Math.random()<0.25) flash(1);
       if(audioCtx && Math.random()<0.18) beep(650+Math.random()*500, 0.05, "square", 0.08);
       i++;
-    }, 520);
+    }, 420);
   }
 
   function darkWebPhase(){
@@ -988,7 +1049,13 @@
     addLine("📡 Exit node handshake: OK", "dim");
     addLine("🧬 Packaging media archive: media_dump.tar", "dim");
     addLine("⚠ Upload destination: dark-web mirror", "warn");
+
+    addFeed("TOR ROUTE: ONLINE", false);
+    addFeed("DESTINATION: DARK-WEB MIRROR", true);
+
     $("footerWarn").textContent = "DARK WEB MIRROR: CONNECTED";
+    spawnPopup(`Destination set: <span class="bad">dark-web mirror</span>.<br>Channel: TOR/HTTPS`);
+
     if(audioCtx) startSiren(1200);
     flash(2);
     vibrate([80,60,80]);
@@ -998,29 +1065,38 @@
 
   function uploadPhase(){
     addLine("⬆ Uploading discovered media…", "warn");
+    addFeed("UPLOAD STARTED…", true);
+
     $("threat").textContent = "THREAT: EXFILTRATION";
     $("footerWarn").textContent = "MEDIA EXFILTRATION IN PROGRESS";
 
     let percent = 0;
     const up = setInterval(()=>{
-      percent += Math.floor(Math.random()*16)+6;
+      percent += Math.floor(Math.random()*14)+7;
       if(percent >= 100){
         percent = 100;
         addLine("Upload progress: 100% (mirror synced)", "warn");
+        addFeed("UPLOAD: 100% (MIRROR SYNCED)", true);
+        spawnPopup(`Upload complete.<br><span class="bad">Mirror synced</span>.`);
         clearInterval(up);
-        setTimeout(()=>deletePhase(), 850);
+        setTimeout(()=>deletePhase(), 1000);
         return;
       }
       addLine("Upload progress: " + percent + "%", percent > 70 ? "warn" : "");
+      addFeed("UPLOAD: " + percent + "%", percent > 70);
       if(audioCtx) beep(600+Math.random()*400, 0.05, "square", 0.10);
-      if(Math.random()<0.18) flash(1);
+      if(Math.random()<0.16) flash(1);
     }, 420);
   }
 
   function deletePhase(){
     addLine("🗑 Removing local copies…", "warn");
+    addFeed("LOCAL PURGE INITIATED", true);
+
     $("threat").textContent = "THREAT: DATA LOSS";
     $("footerWarn").textContent = "LOCAL DATA: PURGE";
+
+    spawnPopup(`Local purge requested.<br><span class="bad">Recovery disabled</span>.`);
 
     const msgs = [
       "Deleting DCIM/Camera/IMG_4921.jpg…",
@@ -1037,21 +1113,24 @@
       if(i >= msgs.length){
         clearInterval(del);
         addLine("Purge complete. Recovery: DISABLED", "warn");
+        addFeed("PURGE COMPLETE — RECOVERY: DISABLED", true);
         setTimeout(()=>lockScreenPhase(), 1500);
         return;
       }
       addLine(msgs[i], "warn");
+      addFeed(msgs[i], true);
       glitchBurst();
       if(audioCtx && Math.random()<0.55) beep(980+Math.random()*700, 0.05, "square", 0.11);
       i++;
-    }, 780);
+    }, 760);
   }
 
-  // --------- Final lock screen ----------
+  // ---------- Lock, then Rick Roll ----------
   function lockScreenPhase(){
-    // Slow, dramatic, not instant
     addLine("⚠ REMOTE ENFORCEMENT: ENABLED", "warn");
     addLine("Applying device lock policy…", "dim");
+    addFeed("LOCKDOWN POLICY APPLIED", true);
+
     $("footerWarn").textContent = "ENFORCING LOCKDOWN";
 
     setTimeout(()=>{
@@ -1066,7 +1145,7 @@
         beep(200,0.2,"sawtooth",0.2);
       }
 
-      // Make the “PIN” always fail (harmless)
+      // PIN always fails (harmless)
       const pin = $("pinInput");
       const err = $("pinErr");
       const fail = ()=>{
@@ -1076,32 +1155,71 @@
         if(pin) pin.value = "";
       };
       if(pin){
-        pin.addEventListener("keydown", (e)=>{
-          if(e.key === "Enter") fail();
-        });
-        pin.addEventListener("input", ()=>{
-          if(pin.value.length >= 4) fail();
-        });
+        pin.addEventListener("keydown", (e)=>{ if(e.key === "Enter") fail(); });
+        pin.addEventListener("input", ()=>{ if(pin.value.length >= 4) fail(); });
       }
 
-      // Keep it twitchy
-      let ticks = 0;
-      const twitch = setInterval(()=>{
-        ticks++;
-        if(Math.random()<0.35) flash(1);
-        if(Math.random()<0.25) vibrate([40,30,40]);
-        if(audioCtx && Math.random()<0.25) beep(900+Math.random()*700, 0.05, "square", 0.09);
-        if(ticks > 16) clearInterval(twitch);
-      }, 340);
-
+      // After a beat, drop the final payload (Rick Roll)
+      setTimeout(()=>finalPayloadRickRoll(), 5200);
     }, 2400);
   }
 
-  // --------- First tap unlocks fullscreen + sound ----------
+  function finalPayloadRickRoll(){
+    // Hide everything else
+    lock.style.display = "none";
+    epic.style.opacity = "0";
+    $("wrap").style.display = "none";
+    popLayer.style.display = "none";
+    redEl.style.opacity = "0";
+    flash(2);
+
+    final.style.display = "block";
+    final.setAttribute("aria-hidden","false");
+
+    // Try to embed YouTube. Autoplay often blocked, so button will start it.
+    const playBtn = $("playBtn");
+    const slot = $("vidSlot");
+
+    const videoId = "dQw4w9WgXcQ";
+    function mountVideo(autoplay){
+      slot.innerHTML = `
+        <iframe
+          src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&playsinline=1&rel=0&modestbranding=1"
+          title="Incident Report"
+          frameborder="0"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      `;
+    }
+
+    // Pre-mount without autoplay (works reliably)
+    mountVideo(false);
+
+    playBtn.addEventListener("click", ()=>{
+      // Re-mount with autoplay (user gesture = allowed)
+      mountVideo(true);
+      playBtn.style.display = "none";
+      if(audioCtx){ beep(880,0.08,"square",0.12); }
+      vibrate([80,40,80]);
+    });
+
+    // Helpful: if iframe blocked, open YouTube directly
+    setTimeout(()=>{
+      if(playBtn.style.display !== "none"){
+        // subtle nudge
+        playBtn.textContent = "PLAY REPORT (TAP)";
+      }
+    }, 1200);
+  }
+
+  // ---------- Fullscreen / sound arming ----------
   let armed = false;
   async function armOnFirstTap(){
     if(armed) return;
     armed = true;
+
+    document.body.classList.add("fullscreen-ish");
 
     const hint = $("tapHint");
     if(hint){
@@ -1109,10 +1227,10 @@
       setTimeout(()=>{ try{hint.remove();}catch(e){} }, 220);
     }
 
-    // Fullscreen (best effort)
+    // Fullscreen best-effort (Chrome may still show bars)
     try{
       const el = document.documentElement;
-      if(el.requestFullscreen) await el.requestFullscreen();
+      if(el.requestFullscreen) await el.requestFullscreen({ navigationUI: "hide" });
       else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
     }catch(e){}
 
@@ -1128,24 +1246,28 @@
 
     addLine("⚠ USER GESTURE CAPTURED", "warn");
     addLine("Audio channel: OPEN", "dim");
-    addLine("Fullscreen lock: ATTEMPTED", "dim");
+    addLine("Fullscreen mode: REQUESTED", "dim");
+    addLine("Tip: Add to Home Screen for true no-bars mode", "dim");
   }
 
   document.addEventListener("pointerdown", ()=>armOnFirstTap(), {passive:true});
   document.addEventListener("keydown", ()=>armOnFirstTap(), {passive:true});
 
-  // Extra: random mini-glitches on taps
+  // ---------- Random mini-glitches on taps ----------
   document.addEventListener("click", ()=>{
-    if(Math.random()<0.22){
+    if(Math.random()<0.18){
       glitchBurst();
       addLine("⚠ INPUT CAPTURED", "warn");
       if(audioCtx) beep(1100,0.05,"square",0.10);
     }
   }, {passive:true});
 
-  // Start NOW (no welcome screen)
-  updateGpsHud();
+  // ---------- Start NOW ----------
   startImmediate();
+
+  // ---------- Optional: true fullscreen tip ----------
+  // Best solution (real-world): add this page to Home Screen.
+  // Android: Chrome ⋮ > Add to Home screen. Then opening it is near full immersive.
 </script>
 </body>
 </html>
