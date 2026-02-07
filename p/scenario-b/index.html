@@ -695,7 +695,7 @@ function loop(time){
   tsEl.textContent = nowStamp();
 
   frames++;
-  if(time - lastT >= 650){
+  if(time - lastT >= 1650){
     const fps = Math.round((frames * 1000) / (time - lastT));
     frames = 0;
     lastT = time;
@@ -801,7 +801,7 @@ async function faceSlam(){
   frame.style.transform = "";
 
   // HOLD on screen for 2.5 seconds (REAL wait)
-  const HOLD_MS = 5000;
+  const HOLD_MS = 2500;
   await sleep(HOLD_MS);
 
   // Hide overlay
