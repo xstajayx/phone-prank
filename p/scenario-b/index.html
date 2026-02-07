@@ -130,7 +130,7 @@
     align-items:center; justify-content:center;
     background: rgba(0,0,0,.55);
     backdrop-filter: blur(10px);
-    z-index:400; /* was 200 - so report dialog can overlay the face image */
+    z-index:400; /* raised so it overlays the face image */
     padding:18px;
   }
   .dialog{
@@ -199,7 +199,7 @@
     background:#000;
     align-items:center;
     justify-content:center;
-    pointer-events:none; /* IMPORTANT: lets report dialog buttons work on top */
+    pointer-events:none; /* lets report dialog buttons work on top */
   }
   #scare.show{ display:flex; }
 
@@ -406,7 +406,6 @@
 
 <script>
 /* ========= CONFIG ========= */
-/* report page is now index.html inside /report/ */
 const REPORT_URL = "/message-media-space/report/?src=scenario-b";
 const FACE_IMAGE = "faceslam.png"; // in same folder
 
@@ -789,10 +788,7 @@ async function faceSlam(){
   const HOLD_MS = 3000;
   await sleep(HOLD_MS);
 
-  // IMPORTANT CHANGE:
-  // Do NOT hide the overlay anymore — keep the image on screen.
-  // (No scare.classList.remove("show") here)
-
+  // Keep overlay visible (do not hide)
   slamBusy = false;
 }
 
@@ -821,7 +817,6 @@ document.getElementById("d1ok").addEventListener("click", async ()=>{
   msgEl.textContent = "Continuing…";
   modeEl.textContent = "ANALYSE";
 
-  // Slam, then show the report dialog on top of the image
   await faceSlam();
 
   msgEl.textContent = "Viewer error detected";
@@ -829,6 +824,11 @@ document.getElementById("d1ok").addEventListener("click", async ()=>{
 });
 
 document.getElementById("d2ok").addEventListener("click", ()=>{
+  /* NEW: hide the face overlay right before navigating */
+  scare.classList.remove("show");
+  scare.setAttribute("aria-hidden","true");
+  slamBox.classList.remove("hit", "prep");
+
   location.href = REPORT_URL;
 });
 </script>
