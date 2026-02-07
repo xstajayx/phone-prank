@@ -8,14 +8,12 @@
 <title>Tap404 Incident Report</title>
 <meta name="description" content="Tap404 Incident Report — harmless glitch prank. You're safe 😈 Open the full report." />
 
-<!-- Open Graph Preview -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Tap404 Incident Report" />
 <meta property="og:description" content="Harmless glitch prank. You're safe 😈 Open the full report." />
 <meta property="og:url" content="https://xstajayx.github.io/phone-prank/report.html" />
 <meta property="og:image" content="https://xstajayx.github.io/phone-prank/og-tap404.png" />
 
-<!-- Twitter Preview -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Tap404 Incident Report" />
 <meta name="twitter:description" content="Harmless glitch prank. You're safe 😈 Open the full report." />
@@ -27,48 +25,66 @@
   body{
     margin:0; background:var(--bg); color:var(--g);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+    overflow-x:hidden;
   }
-  .wrap{ max-width:980px; margin:0 auto; padding:16px; }
+  .wrap{ max-width: 980px; margin: 0 auto; padding: 16px 14px calc(24px + env(safe-area-inset-bottom)); }
   .card{
-    border-radius:22px;
-    border:1px solid rgba(0,255,102,.22);
-    background:var(--glass);
-    padding:16px;
-    margin-top:12px;
+    border-radius: 22px; border:1px solid rgba(0,255,102,.22);
+    background: var(--glass);
+    box-shadow: 0 0 0 1px rgba(0,255,102,.06), 0 24px 70px rgba(0,0,0,.55);
+    padding: 16px 14px; margin-top: 12px; position: relative; overflow:hidden;
   }
-  h1{ letter-spacing:.16em; text-transform:uppercase; }
-  .sub{ color:rgba(0,255,102,.7); font-size:12px; text-transform:uppercase; }
+  .card::before{
+    content:""; position:absolute; inset:0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,255,102,.040),
+      rgba(0,255,102,.040) 1px,
+      rgba(0,0,0,0) 3px,
+      rgba(0,0,0,0) 6px
+    );
+    opacity:.45; pointer-events:none; mix-blend-mode: screen;
+  }
+  h1{ margin: 10px 0 4px; letter-spacing:.16em; text-transform: uppercase; font-size: clamp(20px, 5vw, 38px); position:relative; z-index:1; }
+  .sub{ margin:0 0 12px; color: rgba(0,255,102,.70); letter-spacing:.10em; text-transform: uppercase; font-size: 12px; position:relative; z-index:1; }
   .stamp{
-    display:inline-block; margin-top:10px; padding:10px 12px;
-    border-radius:14px; border:1px solid rgba(255,0,51,.38);
-    background:rgba(255,0,51,.08); color:rgba(255,0,51,.95);
-    letter-spacing:.18em; font-weight:900; text-transform:uppercase;
+    display:inline-block; margin-top: 8px; padding: 10px 12px;
+    border-radius: 14px; border:1px solid rgba(255,0,51,.38);
+    background: rgba(255,0,51,.08); color: rgba(255,0,51,.95);
+    letter-spacing:.18em; font-weight: 900; text-transform: uppercase;
+    position:relative; z-index:1;
   }
+  .p{ margin: 14px 0 0; color: rgba(0,255,102,.78); letter-spacing:.04em; line-height: 1.6; position:relative; z-index:1; }
   .safe{
-    margin-top:12px; padding:12px;
-    border-radius:16px; border:1px solid rgba(0,255,102,.18);
-    background:rgba(0,255,102,.06);
+    margin-top: 10px; padding: 12px 12px;
+    border-radius: 16px; border:1px solid rgba(0,255,102,.18);
+    background: rgba(0,255,102,.06); color: rgba(0,255,102,.82);
+    letter-spacing:.06em; line-height:1.55; position:relative; z-index:1;
   }
-  .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .row{ display:flex; gap: 10px; flex-wrap:wrap; margin-top: 14px; position: relative; z-index: 1; }
   .btn{
-    padding:12px 14px; border-radius:14px;
+    padding: 12px 14px; border-radius: 14px;
     border:1px solid rgba(0,255,102,.26);
-    background:rgba(0,255,102,.10);
-    color:rgba(0,255,102,.95);
-    font-weight:900; letter-spacing:.14em;
-    text-transform:uppercase; cursor:pointer;
+    background: rgba(0,255,102,.10);
+    color: rgba(0,255,102,.95);
+    font-weight: 900; letter-spacing:.14em;
+    text-transform: uppercase; cursor:pointer; font-family: inherit;
   }
-  .btn-ghost{ background:rgba(255,255,255,.02); color:rgba(0,255,102,.72); }
+  .btn-ghost{ background: rgba(255,255,255,.02); color: rgba(0,255,102,.72); border-color: rgba(0,255,102,.16); }
+
   .ad{
-    margin-top:10px; padding:20px; text-align:center;
-    border-radius:18px; border:1px dashed rgba(0,255,102,.28);
-    color:rgba(0,255,102,.5);
+    border-radius: 18px; border:1px dashed rgba(0,255,102,.28);
+    background: rgba(0,0,0,.38);
+    padding: 16px; color: rgba(0,255,102,.58);
+    letter-spacing:.10em; text-transform: uppercase;
+    text-align:center; min-height: 120px;
+    display:flex; align-items:center; justify-content:center;
+    position:relative; z-index:1;
   }
-  .mini{ text-align:center; font-size:11px; color:rgba(0,255,102,.5); margin-top:10px; }
+  .mini{ margin-top: 14px; text-align:center; color: rgba(0,255,102,.55); letter-spacing:.10em; text-transform: uppercase; font-size: 11px; position:relative; z-index:1; }
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
   <div class="card">
@@ -76,9 +92,9 @@
     <p class="sub">Diagnostic summary — visual disturbance simulation</p>
     <span class="stamp">YOU’VE BEEN TAPPED</span>
 
-    <p>
-      That whole “incident” was a Tap404 glitch show — a harmless prank page designed to look dramatic.
-      It does NOT access your photos, files, contacts, or device data.
+    <p class="p">
+      That whole “incident” was a <b>Tap404 glitch show</b> — a harmless prank page designed to look dramatic.
+      It doesn’t access your photos, files, contacts, or device data.
     </p>
 
     <div class="safe">
@@ -91,25 +107,38 @@
       <button class="btn btn-ghost" id="runAgain">RUN AGAIN</button>
     </div>
 
-    <div class="mini">Sharing sends people to this report page (so the loop supports the project).</div>
+    <div class="mini">Pass it on shares the surprise link (the prank page).</div>
   </div>
 
+  <!-- AD SLOT 1 -->
   <div class="card">
-    <h1 style="font-size:16px;">Sponsored</h1>
+    <h1 style="font-size:16px; margin:0 0 8px; letter-spacing:.14em; position:relative; z-index:1;">Sponsored</h1>
     <div class="ad">AD SLOT (AdSense)</div>
+    <div class="mini">Replace this with your AdSense code once approved.</div>
   </div>
 
   <div class="card">
-    <h1 style="font-size:16px;">Try my games</h1>
+    <h1 style="font-size:16px; margin:0 0 8px; letter-spacing:.14em; position:relative; z-index:1;">Try my games</h1>
+    <p class="sub">If you like chaos + quick fun</p>
     <div class="row">
       <button class="btn" id="btnOverrun">OVERUN</button>
       <button class="btn" id="btnDarts">DARTS MASTER</button>
     </div>
+    <p class="p" style="margin-top:12px;">
+      Downloads + ads inside the games help support more projects like this.
+    </p>
+  </div>
+
+  <!-- AD SLOT 2 -->
+  <div class="card">
+    <h1 style="font-size:16px; margin:0 0 8px; letter-spacing:.14em; position:relative; z-index:1;">Sponsored</h1>
+    <div class="ad">AD SLOT (AdSense)</div>
+    <div class="mini">Second slot for better RPM once traffic grows.</div>
   </div>
 
   <div class="card">
-    <h1 style="font-size:16px;">Creator</h1>
-    <p>Built by <b>Jworldcreations</b>. More games & tools coming soon.</p>
+    <h1 style="font-size:16px; margin:0 0 8px; letter-spacing:.14em; position:relative; z-index:1;">Creator</h1>
+    <p class="p" style="margin-top:8px;">Built by <b>Jworldcreations</b>. More games/tools incoming (including Wiser Today).</p>
   </div>
 
 </div>
@@ -117,19 +146,27 @@
 <script>
   const OVERUN_URL = "https://play.google.com/store/apps/details?id=com.jworldcreations.overrun";
   const DARTS_URL  = "https://play.google.com/store/apps/details?id=com.jworldcreations.dartsmaster";
-  const REPORT_URL = "https://xstajayx.github.io/phone-prank/report.html?src=tap404";
+
+  // Share the SURPRISE link (prank page), not the report page:
+  const PRANK_URL = "https://xstajayx.github.io/phone-prank/";
 
   document.getElementById("passItOn").addEventListener("click", async () => {
+    // Keep it subtle so it doesn't scream “prank”
     const shareData = {
-      title: "Tap404 Incident Report",
-      text: "Open the full incident report 😈",
-      url: REPORT_URL
+      title: "System Alert",
+      text: "Can you check this for me?",
+      url: PRANK_URL
     };
+
     if (navigator.share) {
-      try { await navigator.share(shareData); } catch(e){}
+      try { await navigator.share(shareData); } catch(e) {}
     } else {
-      navigator.clipboard.writeText(REPORT_URL);
-      alert("Link copied. Deploy to your next victim 😈");
+      try{
+        await navigator.clipboard.writeText(PRANK_URL);
+        alert("Link copied.");
+      }catch(e){
+        prompt("Copy this link:", PRANK_URL);
+      }
     }
   });
 
@@ -137,14 +174,8 @@
     window.location.href = "./index.html";
   });
 
-  document.getElementById("btnOverrun").addEventListener("click", () => {
-    window.open(OVERUN_URL, "_blank");
-  });
-
-  document.getElementById("btnDarts").addEventListener("click", () => {
-    window.open(DARTS_URL, "_blank");
-  });
+  document.getElementById("btnOverrun").addEventListener("click", () => window.open(OVERUN_URL, "_blank"));
+  document.getElementById("btnDarts").addEventListener("click", () => window.open(DARTS_URL, "_blank"));
 </script>
-
 </body>
 </html>
