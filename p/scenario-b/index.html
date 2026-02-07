@@ -739,7 +739,7 @@ function doFlash(){
   setTimeout(()=> f.style.opacity = "0", 90);
 }
 
-function glitchHit(ms=5200){
+function glitchHit(ms=520){
   glitching = true;
   frame.classList.add("shake");
   doFlash();
@@ -789,7 +789,7 @@ async function faceSlam(){
   void slamBox.offsetWidth;
   slamBox.classList.add("prep");
 
-  await sleep(170);
+  await sleep(500);
 
   slamBox.classList.add("hit");
   doFlash();
@@ -797,8 +797,7 @@ async function faceSlam(){
   if(navigator.vibrate) navigator.vibrate([90,30,120,40,160]);
   frame.style.transform = "";
 
-  // HOLD on screen for 2.5 seconds (REAL wait)
-  const HOLD_MS = 2500;
+  const HOLD_MS = 3000;
   await sleep(HOLD_MS);
 
   // Hide overlay
