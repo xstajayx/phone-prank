@@ -797,14 +797,13 @@ async function faceSlam(){
   if(navigator.vibrate) navigator.vibrate([90,30,120,40,160]);
   frame.style.transform = "";
 
-  const HOLD_MS = 3000;
-  await sleep(HOLD_MS);
+const HOLD_MS = 3000;
+await sleep(HOLD_MS);
 
+// keep image visible, just show final message on top
+document.getElementById("finalMsg").classList.add("show");
   // Hide overlay
-  scare.classList.remove("show");
-  scare.setAttribute("aria-hidden","true");
-  slamBox.classList.remove("hit", "prep");
-
+ 
   slamBusy = false;
 }
 
