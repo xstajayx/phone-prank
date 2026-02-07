@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+
+<title>Tap404 Incident Report</title>
+<meta name="description" content="Tap404 Incident Report — harmless glitch prank. You're safe 😈 Open the full report." />
+
+<!-- Open Graph Preview -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Tap404 Incident Report" />
+<meta property="og:description" content="Harmless glitch prank. You're safe 😈 Open the full report." />
+<meta property="og:url" content="https://xstajayx.github.io/phone-prank/report.html" />
+<meta property="og:image" content="https://xstajayx.github.io/phone-prank/og-tap404.png" />
+
+<!-- Twitter Preview -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tap404 Incident Report" />
+<meta name="twitter:description" content="Harmless glitch prank. You're safe 😈 Open the full report." />
+<meta name="twitter:image" content="https://xstajayx.github.io/phone-prank/og-tap404.png" />
+
+<style>
+  :root{ --g:#00ff66; --r:#ff0033; --bg:#000; --glass: rgba(0,0,0,.62); }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  body{
+    margin:0; background:var(--bg); color:var(--g);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+  .wrap{ max-width:980px; margin:0 auto; padding:16px; }
+  .card{
+    border-radius:22px;
+    border:1px solid rgba(0,255,102,.22);
+    background:var(--glass);
+    padding:16px;
+    margin-top:12px;
+  }
+  h1{ letter-spacing:.16em; text-transform:uppercase; }
+  .sub{ color:rgba(0,255,102,.7); font-size:12px; text-transform:uppercase; }
+  .stamp{
+    display:inline-block; margin-top:10px; padding:10px 12px;
+    border-radius:14px; border:1px solid rgba(255,0,51,.38);
+    background:rgba(255,0,51,.08); color:rgba(255,0,51,.95);
+    letter-spacing:.18em; font-weight:900; text-transform:uppercase;
+  }
+  .safe{
+    margin-top:12px; padding:12px;
+    border-radius:16px; border:1px solid rgba(0,255,102,.18);
+    background:rgba(0,255,102,.06);
+  }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn{
+    padding:12px 14px; border-radius:14px;
+    border:1px solid rgba(0,255,102,.26);
+    background:rgba(0,255,102,.10);
+    color:rgba(0,255,102,.95);
+    font-weight:900; letter-spacing:.14em;
+    text-transform:uppercase; cursor:pointer;
+  }
+  .btn-ghost{ background:rgba(255,255,255,.02); color:rgba(0,255,102,.72); }
+  .ad{
+    margin-top:10px; padding:20px; text-align:center;
+    border-radius:18px; border:1px dashed rgba(0,255,102,.28);
+    color:rgba(0,255,102,.5);
+  }
+  .mini{ text-align:center; font-size:11px; color:rgba(0,255,102,.5); margin-top:10px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="card">
+    <h1>Tap404 Incident Report</h1>
+    <p class="sub">Diagnostic summary — visual disturbance simulation</p>
+    <span class="stamp">YOU’VE BEEN TAPPED</span>
+
+    <p>
+      That whole “incident” was a Tap404 glitch show — a harmless prank page designed to look dramatic.
+      It does NOT access your photos, files, contacts, or device data.
+    </p>
+
+    <div class="safe">
+      ✅ <b>You’re safe.</b> Nothing was hacked.<br>
+      If it got you… you’re allowed to get someone else 😈
+    </div>
+
+    <div class="row">
+      <button class="btn" id="passItOn">PASS IT ON 😈</button>
+      <button class="btn btn-ghost" id="runAgain">RUN AGAIN</button>
+    </div>
+
+    <div class="mini">Sharing sends people to this report page (so the loop supports the project).</div>
+  </div>
+
+  <div class="card">
+    <h1 style="font-size:16px;">Sponsored</h1>
+    <div class="ad">AD SLOT (AdSense)</div>
+  </div>
+
+  <div class="card">
+    <h1 style="font-size:16px;">Try my games</h1>
+    <div class="row">
+      <button class="btn" id="btnOverrun">OVERUN</button>
+      <button class="btn" id="btnDarts">DARTS MASTER</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h1 style="font-size:16px;">Creator</h1>
+    <p>Built by <b>Jworldcreations</b>. More games & tools coming soon.</p>
+  </div>
+
+</div>
+
+<script>
+  const OVERUN_URL = "https://play.google.com/store/apps/details?id=com.jworldcreations.overrun";
+  const DARTS_URL  = "https://play.google.com/store/apps/details?id=com.jworldcreations.dartsmaster";
+  const REPORT_URL = "https://xstajayx.github.io/phone-prank/report.html?src=tap404";
+
+  document.getElementById("passItOn").addEventListener("click", async () => {
+    const shareData = {
+      title: "Tap404 Incident Report",
+      text: "Open the full incident report 😈",
+      url: REPORT_URL
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch(e){}
+    } else {
+      navigator.clipboard.writeText(REPORT_URL);
+      alert("Link copied. Deploy to your next victim 😈");
+    }
+  });
+
+  document.getElementById("runAgain").addEventListener("click", () => {
+    window.location.href = "./index.html";
+  });
+
+  document.getElementById("btnOverrun").addEventListener("click", () => {
+    window.open(OVERUN_URL, "_blank");
+  });
+
+  document.getElementById("btnDarts").addEventListener("click", () => {
+    window.open(DARTS_URL, "_blank");
+  });
+</script>
+
+</body>
+</html>
