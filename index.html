@@ -3,526 +3,212 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#000000" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#111111" />
 
-<!-- TROJAN HORSE PREVIEW -->
-<title>Wait… is this real?</title>
-<meta name="description" content="I can’t tell if this is fake or not" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Wait… is this real?" />
-<meta property="og:description" content="I can’t tell if this is fake or not" />
+<title>Opening media…</title>
+<meta name="description" content="Opening shared media…" />
+<meta property="og:title" content="Wait… look at this" />
+<meta property="og:description" content="This is weird…" />
 <meta property="og:image" content="https://xstajayx.github.io/message-media-space/preview.jpg" />
-<meta property="og:url" content="https://xstajayx.github.io/message-media-space/" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Wait… is this real?" />
-<meta name="twitter:description" content="I can’t tell if this is fake or not" />
-<meta name="twitter:image" content="https://xstajayx.github.io/message-media-space/preview.jpg" />
 
 <style>
-  :root{
-    --g:#00ff66; --r:#ff0033; --bg:#000;
-    --muted: rgba(0,255,102,.65);
-  }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-  html,body{ height:100%; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{
-    margin:0; background:var(--bg); color:var(--g);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-    overflow:hidden; user-select:none;
-  }
-  body.fullscreen-ish{ overscroll-behavior:none; touch-action: manipulation; }
-
-  /* Flash + alert overlays */
-  #flash{ position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:99999; transition:opacity .06s linear; }
-  #redalert{
-    position:fixed; inset:0;
-    background: radial-gradient(ellipse at center, rgba(255,0,51,.18), rgba(0,0,0,.88) 65%);
-    opacity:0; pointer-events:none; z-index:90000; transition: opacity .18s ease;
+    margin:0;
+    background:#0f0f0f;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    color:#fff;
+    overflow:hidden;
   }
 
-  #wrap{ position:fixed; inset:0; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); }
-
-  .top{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:12px; border:1px solid rgba(0,255,102,.22);
-    border-radius:16px; background:rgba(0,0,0,.48);
-    box-shadow:0 0 0 1px rgba(0,255,102,.06);
-  }
-  .badge{
-    display:inline-flex; align-items:center; gap:10px;
-    font-size:12px; letter-spacing:.12em; color:rgba(255,0,51,.92);
-    text-transform:uppercase;
-  }
-  .dot{ width:10px; height:10px; border-radius:999px; background:var(--r); box-shadow:0 0 12px rgba(255,0,51,.6); animation: blink 1s infinite; }
-  @keyframes blink{ 50%{ opacity:.12; } }
-  .hint{ font-size:12px; letter-spacing:.10em; color:rgba(0,255,102,.62); text-transform:uppercase; }
-
-  .grid{ margin-top:12px; display:grid; grid-template-columns:1fr; gap:12px; height: calc(100% - 74px); }
-  .panel{
-    border:1px solid rgba(0,255,102,.22); border-radius:18px; background:rgba(0,0,0,.48);
-    padding:12px; overflow:hidden; position:relative;
-  }
-  .panel::before{
-    content:""; position:absolute; inset:0;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0,255,102,.045),
-      rgba(0,255,102,.045) 1px,
-      rgba(0,0,0,.0) 3px,
-      rgba(0,0,0,.0) 6px
-    );
-    mix-blend-mode:screen; pointer-events:none; opacity:.55;
-  }
-  .panel::after{
-    content:""; position:absolute; inset:-20px;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.62) 85%);
-    pointer-events:none;
-  }
-  .title{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; position:relative; z-index:1; }
-  .title h2{ margin:0; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:rgba(0,255,102,.9); }
-  .title .threat{ font-size:12px; letter-spacing:.1em; color:rgba(255,0,51,.92); text-transform:uppercase; }
-
-  #log{
-    height: 46vh; overflow:hidden;
-    border-radius:14px; border:1px solid rgba(0,255,102,.16);
-    padding:10px; background:rgba(0,0,0,.36);
-    box-shadow: inset 0 0 0 1px rgba(0,255,102,.06);
-    position:relative; z-index:1;
-  }
-  .line{ font-size:13px; line-height:1.35; color:rgba(0,255,102,.92); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .dim{ color:rgba(0,255,102,.62); }
-  .warn{ color:rgba(255,0,51,.95); text-shadow:0 0 14px rgba(255,0,51,.2); }
-  .cyan{ color:rgba(0,200,255,.85); text-shadow:0 0 14px rgba(0,200,255,.18); }
-
-  .bars{ margin-top:10px; display:grid; gap:10px; position:relative; z-index:1; }
-  .barrow{
-    display:grid; grid-template-columns:auto 1fr auto;
-    align-items:center; gap:10px;
-    font-size:12px; color:rgba(0,255,102,.75);
-    letter-spacing:.08em; text-transform:uppercase;
-  }
-  .track{ height:10px; border-radius:999px; border:1px solid rgba(0,255,102,.22); overflow:hidden; background:rgba(0,0,0,.35); }
-  .fill{
-    height:100%; width:0%;
-    background: linear-gradient(90deg, rgba(0,255,102,.78), rgba(0,255,102,.22));
-    box-shadow:0 0 20px rgba(0,255,102,.18);
-    border-radius:999px; transition: width .12s linear;
+  /* Fake app header */
+  .appbar{
+    height:56px;
+    display:flex;
+    align-items:center;
+    padding:0 16px;
+    background:#1c1c1e;
+    font-weight:600;
+    letter-spacing:.3px;
   }
 
-  #footerWarn{
-    margin-top:10px; padding:10px 12px; border-radius:14px;
-    border:1px solid rgba(255,0,51,.35);
-    color:rgba(255,0,51,.92);
-    background:rgba(255,0,51,.08);
-    letter-spacing:.12em; text-transform:uppercase; text-align:center;
-    font-size:12px; position:relative; z-index:1;
+  .content{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    height:calc(100vh - 56px);
+    text-align:center;
+    padding:20px;
   }
 
-  .shake{ animation: shake .14s infinite; }
+  .previewBox{
+    width:min(320px,80vw);
+    aspect-ratio:1/1;
+    border-radius:20px;
+    background:linear-gradient(135deg,#2a2a2e,#1c1c1f);
+    box-shadow:0 10px 40px rgba(0,0,0,.6);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .spinner{
+    width:48px;height:48px;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.2);
+    border-top-color:#fff;
+    animation:spin 1s linear infinite;
+    margin-top:24px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .status{
+    margin-top:16px;
+    font-size:15px;
+    color:#cfcfcf;
+  }
+
+  /* Fake system popups */
+  .dialog{
+    position:fixed;
+    left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    width:min(340px,90vw);
+    background:#2c2c2e;
+    border-radius:18px;
+    padding:18px 16px;
+    box-shadow:0 20px 60px rgba(0,0,0,.7);
+    text-align:center;
+    display:none;
+  }
+  .dialog h3{
+    margin:0 0 8px;
+    font-size:16px;
+    font-weight:600;
+  }
+  .dialog p{
+    margin:0 0 14px;
+    font-size:14px;
+    color:#d0d0d0;
+    line-height:1.4;
+  }
+  .dialog button{
+    background:#3a82f7;
+    border:none;
+    border-radius:12px;
+    padding:10px 16px;
+    color:#fff;
+    font-weight:600;
+    width:100%;
+  }
+
+  /* Glitch effect */
+  .glitch{
+    animation:shake .12s infinite;
+  }
   @keyframes shake{
-    0%{ transform: translate(0,0) rotate(0deg); }
-    20%{ transform: translate(1px,-1px) rotate(-.2deg); }
-    40%{ transform: translate(-1px,1px) rotate(.2deg); }
-    60%{ transform: translate(2px,1px) rotate(-.2deg); }
-    80%{ transform: translate(-2px,-1px) rotate(.2deg); }
-    100%{ transform: translate(0,0) rotate(0deg); }
+    0%{transform:translate(0,0)}
+    25%{transform:translate(1px,-1px)}
+    50%{transform:translate(-1px,1px)}
+    75%{transform:translate(1px,1px)}
+    100%{transform:translate(0,0)}
   }
 
-  /* Popups */
-  #popLayer{ position:fixed; inset:0; pointer-events:none; z-index:80000; }
-  .pop{
-    position:absolute; width:min(290px,84vw);
-    border-radius:14px; border:1px solid rgba(0,255,102,.26);
-    background:rgba(0,0,0,.78);
-    box-shadow:0 12px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(0,255,102,.08);
-    overflow:hidden; pointer-events:auto;
+  /* Final reveal */
+  #reveal{
+    position:fixed;
+    inset:0;
+    background:#111;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
   }
-  .pop .bar{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:10px; border-bottom:1px solid rgba(0,255,102,.16);
-    background:rgba(0,255,102,.08);
+  #reveal h1{
+    font-size:28px;
+    letter-spacing:.1em;
   }
-  .pop .bar .t{ font-size:12px; letter-spacing:.10em; text-transform:uppercase; color:rgba(0,255,102,.9); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .pop .bar .x{
-    width:30px; height:26px; border-radius:10px;
-    border:1px solid rgba(255,0,51,.35);
-    color:rgba(255,0,51,.95);
-    background:rgba(255,0,51,.08);
-    font-weight:900; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .pop .body{ padding:10px; font-size:12px; color:rgba(0,255,102,.75); letter-spacing:.06em; line-height:1.35; }
-  .pop .body .bad{ color:rgba(255,0,51,.95); font-weight:800; }
-
-  /* Finale overlay */
-  #finale{
-    position:fixed; inset:0;
-    display:none; align-items:center; justify-content:center;
-    background: radial-gradient(ellipse at center, rgba(0,255,102,.06), rgba(0,0,0,.94) 60%);
-    z-index:999990; padding:18px;
-  }
-  #finale.show{ display:flex; }
-  .finalCard{
-    width:min(860px,96vw);
-    border-radius:26px;
-    border:1px solid rgba(0,255,102,.22);
-    background:rgba(0,0,0,.78);
-    box-shadow:0 0 0 1px rgba(0,255,102,.08), 0 30px 110px rgba(0,0,0,.72);
-    padding:18px 16px 14px;
-    position:relative; overflow:hidden; text-align:center;
-  }
-  .finalCard::before{
-    content:""; position:absolute; inset:0;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0,255,102,.040),
-      rgba(0,255,102,.040) 1px,
-      rgba(0,0,0,0) 3px,
-      rgba(0,0,0,0) 6px
-    );
-    opacity:.55; pointer-events:none; mix-blend-mode:screen;
-  }
-  .big{
-    position:relative; z-index:1;
-    margin:4px 0 6px;
-    font-size: clamp(22px, 6vw, 44px);
-    letter-spacing:.16em; text-transform:uppercase;
-    color:rgba(0,255,102,.95);
-  }
-  .sub{
-    position:relative; z-index:1;
-    margin:0 0 12px;
-    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
-    color:rgba(0,255,102,.68);
-  }
-  .chip{
-    position:relative; z-index:1;
-    display:inline-block;
-    margin:10px auto 14px;
-    padding:10px 14px;
+  #reveal button{
+    margin-top:20px;
+    padding:12px 18px;
     border-radius:14px;
-    border:1px solid rgba(255,0,51,.35);
-    background:rgba(255,0,51,.08);
-    color:rgba(255,0,51,.95);
-    font-weight:900; letter-spacing:.18em; text-transform:uppercase;
-  }
-  .btnRow{ position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
-  .btn{
-    padding:12px 14px; border-radius:14px;
-    border:1px solid rgba(0,255,102,.28);
-    background:rgba(0,255,102,.10);
-    color:rgba(0,255,102,.95);
-    font-weight:900; letter-spacing:.14em; text-transform:uppercase;
-    cursor:pointer; font-family:inherit;
-  }
-  .btnGhost{ border-color:rgba(0,255,102,.18); background:rgba(255,255,255,.02); color:rgba(0,255,102,.72); }
-  .tiny{
-    position:relative; z-index:1;
-    margin-top:12px; opacity:.6; font-size:11px;
-    letter-spacing:.10em; text-transform:uppercase;
-  }
-
-  #tapHint{
-    position:fixed; left:12px; right:12px;
-    bottom: calc(12px + env(safe-area-inset-bottom));
-    padding:10px 12px; border-radius:14px;
-    border:1px solid rgba(0,255,102,.20);
-    background:rgba(0,0,0,.55);
-    color:rgba(0,255,102,.66);
-    font-size:12px; letter-spacing:.12em; text-transform:uppercase; text-align:center;
-    z-index:1200; pointer-events:none; opacity:.88;
+    border:none;
+    background:#00ff66;
+    color:#000;
+    font-weight:700;
   }
 </style>
 </head>
 <body>
 
-<div id="flash"></div>
-<div id="redalert"></div>
-<div id="popLayer"></div>
+<div class="appbar">Media Viewer</div>
 
-<div id="wrap">
-  <div class="top">
-    <div class="badge"><span class="dot"></span> SESSION DISPLAY ACTIVE</div>
-    <div class="hint" id="hint">tap anywhere</div>
-  </div>
-
-  <div class="grid">
-    <div class="panel" id="panel">
-      <div class="title">
-        <h2>Signal Monitor</h2>
-        <div class="threat" id="threat">MODE: CALIBRATING</div>
-      </div>
-
-      <div id="log"></div>
-
-      <div class="bars">
-        <div class="barrow">
-          <span>SYNC</span>
-          <div class="track"><div class="fill" id="b1"></div></div>
-          <span id="p1">0%</span>
-        </div>
-        <div class="barrow">
-          <span>SCAN</span>
-          <div class="track"><div class="fill" id="b2"></div></div>
-          <span id="p2">0%</span>
-        </div>
-        <div class="barrow">
-          <span>LOAD</span>
-          <div class="track"><div class="fill" id="b3"></div></div>
-          <span id="p3">0%</span>
-        </div>
-      </div>
-
-      <div id="footerWarn">DO NOT CLOSE THIS SCREEN</div>
-    </div>
-  </div>
+<div class="content" id="mainUI">
+  <div class="previewBox" id="box"></div>
+  <div class="spinner" id="spinner"></div>
+  <div class="status" id="status">Opening media…</div>
 </div>
 
-<div id="tapHint">first tap unlocks fullscreen + sound (browser rule)</div>
+<div class="dialog" id="dialog1">
+  <h3>Storage Issue</h3>
+  <p>There was a problem loading this media.</p>
+  <button onclick="nextStage()">OK</button>
+</div>
 
-<!-- Finale -->
-<div id="finale" aria-hidden="true">
-  <div class="finalCard">
-    <div class="big">PLOT TWIST 😈</div>
-    <div class="sub">That was a glitch-show prank simulation</div>
-    <div class="chip">YOU’VE BEEN TAPPED</div>
+<div class="dialog" id="dialog2">
+  <h3>System Sync</h3>
+  <p>Attempting to recover file…</p>
+  <button onclick="nextStage2()">Continue</button>
+</div>
 
-    <div class="btnRow">
-      <button class="btn" id="btnReport">VIEW FULL REPORT</button>
-      <button class="btn btnGhost" id="btnAgain">RUN AGAIN</button>
-    </div>
-
-    <div class="tiny">No device data was accessed — it’s just effects in a webpage.</div>
+<div id="reveal">
+  <div>
+    <h1>YOU’VE BEEN TAPPED 😈</h1>
+    <button onclick="location.href='report.html'">VIEW FULL REPORT</button>
   </div>
 </div>
 
 <script>
-  const $ = (id)=>document.getElementById(id);
-  const logEl = $("log");
-  const flashEl = $("flash");
-  const redEl = $("redalert");
-  const popLayer = $("popLayer");
-  const panel = $("panel");
+const statusEl = document.getElementById("status");
+const box = document.getElementById("box");
 
-  // ====== CONFIG ======
-  const REPORT_URL = "https://xstajayx.github.io/message-media-space/report.html?src=main";
-  const TOTAL_RUNTIME_MS = 24000; // ~half-ish (24s). Change to 18000 for even faster.
+setTimeout(()=>{
+  statusEl.textContent = "Loading preview…";
+},1500);
 
-  // ---------- Helpers ----------
-  function addLine(text, cls=""){
-    const d = document.createElement("div");
-    d.className = "line " + cls;
-    d.textContent = text;
-    logEl.appendChild(d);
-    while(logEl.childNodes.length > 26) logEl.removeChild(logEl.firstChild);
-  }
+setTimeout(()=>{
+  document.getElementById("dialog1").style.display="block";
+},3500);
 
-  function flash(times=2){
-    let i=0;
-    const go=()=>{
-      flashEl.style.opacity="0.9";
-      setTimeout(()=>flashEl.style.opacity="0", 60);
-      i++;
-      if(i<times) setTimeout(go, 120);
-    };
-    go();
-  }
+function nextStage(){
+  document.getElementById("dialog1").style.display="none";
+  document.getElementById("dialog2").style.display="block";
+}
 
-  function vibrate(pattern){
-    try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
-  }
+function nextStage2(){
+  document.getElementById("dialog2").style.display="none";
+  glitchSequence();
+}
 
-  // ---------- Audio (after tap) ----------
-  let audioCtx, masterGain;
-  function initAudio(){
-    if(audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.value = 0.18;
-    masterGain.connect(audioCtx.destination);
-  }
-  function beep(freq=880, dur=0.06, type="square", gain=0.10){
-    if(!audioCtx) return;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type = type;
-    o.frequency.value = freq;
-    g.gain.value = 0.0001;
-    o.connect(g); g.connect(masterGain);
-    const t = audioCtx.currentTime;
-    g.gain.exponentialRampToValueAtTime(gain, t+0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-    o.start(t);
-    o.stop(t+dur+0.02);
-  }
+function glitchSequence(){
+  statusEl.textContent="System stabilising…";
+  box.classList.add("glitch");
+  if(navigator.vibrate) navigator.vibrate([80,40,80]);
+  setTimeout(()=>{
+    statusEl.textContent="Unexpected display error";
+  },1200);
+  setTimeout(()=>{
+    box.classList.remove("glitch");
+    showReveal();
+  },3500);
+}
 
-  function glitchBurst(){
-    panel.classList.add("shake");
-    redEl.style.opacity="1";
-    flash(2);
-    vibrate([60,40,60,90]);
-    if(audioCtx){ beep(1200,0.05,"square",0.12); beep(220,0.12,"sawtooth",0.10); }
-    setTimeout(()=>panel.classList.remove("shake"), 520);
-    setTimeout(()=>redEl.style.opacity="0", 680);
-  }
-
-  // ---------- Popups ----------
-  const popTitles = ["ALERT","NOTICE","SYNC","WARNING","CHECK","VERIFY","SYSTEM","PANEL","STATUS"];
-  function spawnPopup(){
-    const p = document.createElement("div");
-    p.className = "pop";
-    p.style.left = (10 + Math.random()*80) + "vw";
-    p.style.top  = (12 + Math.random()*72) + "vh";
-
-    const title = popTitles[Math.floor(Math.random()*popTitles.length)];
-    const body = [
-      `Display buffer desync.<br><span class="bad">Re-aligning</span>.`,
-      `Signal spike detected.<br><span class="bad">Stabilising</span>.`,
-      `Overlay layer mismatch.<br><span class="bad">Rebuilding</span>.`,
-      `Session echo detected.<br><span class="bad">Muting</span>.`
-    ][Math.floor(Math.random()*4)];
-
-    p.innerHTML = `
-      <div class="bar">
-        <div class="t">${title}</div>
-        <div class="x">X</div>
-      </div>
-      <div class="body">${body}</div>
-    `;
-    const x = p.querySelector(".x");
-    x.addEventListener("pointerenter", ()=>{
-      p.style.left = (10 + Math.random()*80) + "vw";
-      p.style.top  = (12 + Math.random()*72) + "vh";
-      if(Math.random()<0.35) flash(1);
-      if(Math.random()<0.25) glitchBurst();
-      if(Math.random()<0.25 && popLayer.childNodes.length < 10) spawnPopup();
-    });
-    x.addEventListener("click",(e)=>{
-      e.stopPropagation();
-      addLine("⚠ CLOSE BLOCKED (VISUAL LOCK)", "warn");
-      flash(1);
-      if(Math.random()<0.6) glitchBurst();
-    });
-
-    popLayer.appendChild(p);
-    setTimeout(()=>{ try{p.remove();}catch(e){} }, 4500 + Math.random()*2000);
-  }
-
-  function popupStorm(count=6, interval=180){
-    let made=0;
-    const t=setInterval(()=>{
-      spawnPopup();
-      made++;
-      if(made>=count) clearInterval(t);
-    }, interval);
-  }
-
-  // ---------- Progress bars ----------
-  function runBars(){
-    const b1=$("b1"), b2=$("b2"), b3=$("b3");
-    const p1=$("p1"), p2=$("p2"), p3=$("p3");
-    let a=0,b=0,c=0;
-    const tick=()=>{
-      a=Math.min(100,a+(Math.random()*10));
-      b=Math.min(100,b+(Math.random()*12));
-      c=Math.min(100,c+(Math.random()*9));
-
-      b1.style.width=a.toFixed(0)+"%"; p1.textContent=a.toFixed(0)+"%";
-      b2.style.width=b.toFixed(0)+"%"; p2.textContent=b.toFixed(0)+"%";
-      b3.style.width=c.toFixed(0)+"%"; p3.textContent=c.toFixed(0)+"%";
-
-      if(Math.random()<0.12){ flash(1); if(audioCtx) beep(900+Math.random()*600,0.04,"square",0.09); }
-      if(Math.random()<0.10){ glitchBurst(); }
-
-      if(a<100 || b<100 || c<100) setTimeout(tick, 120);
-    };
-    tick();
-  }
-
-  // ---------- Main show (shorter) ----------
-  function startShow(){
-    addLine("BOOT: display stream attached", "dim");
-    addLine("NET: link ok", "dim");
-    addLine("MODE: live overlay", "dim");
-    runBars();
-
-    // Faster steps (safe / theatrical)
-    const steps = [
-      [500,  "Calibrating layers…", "dim"],
-      [1100, "Overlay mismatch detected", ""],
-      [1600, "⚠ VISUAL LOCK engaged", "warn"],
-      [2200, "Rebuilding UI buffers…", "dim"],
-      [2900, "⚠ GLITCH EVENT: spike", "warn"],
-      [3600, "Stabilising…", "dim"],
-      [4400, "⚠ SESSION ECHO detected", "warn"],
-      [5200, "Finalising…", "dim"],
-    ];
-    steps.forEach(([t,msg,cls])=>setTimeout(()=>{
-      addLine(msg, cls);
-      if(cls==="warn"){ glitchBurst(); popupStorm(3,140); }
-      if(audioCtx && Math.random()<0.4) beep(700+Math.random()*900,0.05,"square",0.09);
-    }, t));
-
-    // Quick crescendo
-    setTimeout(()=>{ $("threat").textContent="MODE: UNSTABLE"; $("footerWarn").textContent="DO NOT LOOK AWAY"; popupStorm(7,120); }, 5200);
-    setTimeout(()=>{ glitchBurst(); glitchBurst(); flash(3); vibrate([120,60,120,90]); }, 7800);
-
-    // Hard stop into finale (no long tail)
-    setTimeout(()=>finish(), TOTAL_RUNTIME_MS);
-  }
-
-  function finish(){
-    $("wrap").style.display = "none";
-    popLayer.style.display = "none";
-    redEl.style.opacity = "0";
-    flash(2);
-    const fin = $("finale");
-    fin.classList.add("show");
-    fin.setAttribute("aria-hidden","false");
-    if(audioCtx){ beep(880,0.08,"square",0.12); beep(1320,0.06,"square",0.10); }
-    vibrate([80,40,80]);
-  }
-
-  // ---------- Fullscreen + audio arming ----------
-  let armed=false;
-  async function armOnFirstTap(){
-    if(armed) return;
-    armed=true;
-    document.body.classList.add("fullscreen-ish");
-
-    const hint = $("tapHint");
-    if(hint){ hint.style.opacity="0"; setTimeout(()=>{ try{hint.remove();}catch(e){} }, 220); }
-
-    try{
-      const el = document.documentElement;
-      if(el.requestFullscreen) await el.requestFullscreen({ navigationUI:"hide" });
-      else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-    }catch(e){}
-
-    initAudio();
-    try{ await audioCtx.resume(); }catch(e){}
-
-    flash(2);
-    redEl.style.opacity="1"; setTimeout(()=>redEl.style.opacity="0", 450);
-    vibrate([90,40,90]);
-    beep(980,0.07,"square",0.14);
-
-    addLine("⚠ USER INPUT DETECTED", "warn");
-    addLine("Audio: armed", "dim");
-    addLine("Fullscreen: requested", "dim");
-  }
-
-  document.addEventListener("pointerdown", armOnFirstTap, {passive:true});
-  document.addEventListener("keydown", armOnFirstTap, {passive:true});
-
-  // Buttons
-  $("btnReport").addEventListener("click", ()=>{ location.href = REPORT_URL; });
-  $("btnAgain").addEventListener("click", ()=>{ location.reload(); });
-
-  // Start immediately
-  startShow();
+function showReveal(){
+  document.getElementById("mainUI").style.display="none";
+  document.getElementById("reveal").style.display="flex";
+}
 </script>
+
 </body>
 </html>
