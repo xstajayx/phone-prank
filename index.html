@@ -5,17 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#111111" />
 
-<title>Opening media…</title>
-<meta name="description" content="Opening shared media…" />
+<!-- TROJAN HORSE PREVIEW -->
+<title>Wait… look at this</title>
+<meta name="description" content="This is weird…" />
+<meta property="og:type" content="website" />
 <meta property="og:title" content="Wait… look at this" />
 <meta property="og:description" content="This is weird…" />
 <meta property="og:image" content="https://xstajayx.github.io/message-media-space/preview.jpg" />
+<meta property="og:url" content="https://xstajayx.github.io/message-media-space/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Wait… look at this" />
+<meta name="twitter:description" content="This is weird…" />
+<meta name="twitter:image" content="https://xstajayx.github.io/message-media-space/preview.jpg" />
 
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{
     margin:0;
-    background:#0f0f0f;
+    background:#0f0f10;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     color:#fff;
     overflow:hidden;
@@ -29,7 +36,7 @@
     padding:0 16px;
     background:#1c1c1e;
     font-weight:600;
-    letter-spacing:.3px;
+    letter-spacing:.2px;
   }
 
   .content{
@@ -55,17 +62,17 @@
   .spinner{
     width:48px;height:48px;
     border-radius:50%;
-    border:4px solid rgba(255,255,255,.2);
+    border:4px solid rgba(255,255,255,.18);
     border-top-color:#fff;
     animation:spin 1s linear infinite;
-    margin-top:24px;
+    margin-top:22px;
   }
   @keyframes spin{to{transform:rotate(360deg)}}
 
   .status{
-    margin-top:16px;
+    margin-top:14px;
     font-size:15px;
-    color:#cfcfcf;
+    color:#d7d7d7;
   }
 
   /* Fake system popups */
@@ -80,11 +87,12 @@
     box-shadow:0 20px 60px rgba(0,0,0,.7);
     text-align:center;
     display:none;
+    z-index:50;
   }
   .dialog h3{
     margin:0 0 8px;
     font-size:16px;
-    font-weight:600;
+    font-weight:650;
   }
   .dialog p{
     margin:0 0 14px;
@@ -98,14 +106,13 @@
     border-radius:12px;
     padding:10px 16px;
     color:#fff;
-    font-weight:600;
+    font-weight:650;
     width:100%;
+    cursor:pointer;
   }
 
   /* Glitch effect */
-  .glitch{
-    animation:shake .12s infinite;
-  }
+  .glitch{ animation:shake .12s infinite; }
   @keyframes shake{
     0%{transform:translate(0,0)}
     25%{transform:translate(1px,-1px)}
@@ -114,33 +121,68 @@
     100%{transform:translate(0,0)}
   }
 
-  /* Final reveal */
-  #reveal{
+  /* Screen flash */
+  #flash{
+    position:fixed; inset:0;
+    background:#fff;
+    opacity:0;
+    pointer-events:none;
+    z-index:999;
+    transition: opacity .08s linear;
+  }
+
+  /* Ending overlay (neutral) */
+  #ending{
     position:fixed;
     inset:0;
-    background:#111;
+    background: rgba(15,15,16,.92);
     display:none;
     align-items:center;
     justify-content:center;
     text-align:center;
     padding:20px;
+    z-index:100;
+    backdrop-filter: blur(8px);
   }
-  #reveal h1{
-    font-size:28px;
-    letter-spacing:.1em;
+  .endCard{
+    width:min(420px,92vw);
+    background:#1c1c1e;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:20px;
+    padding:18px 16px;
+    box-shadow:0 20px 60px rgba(0,0,0,.65);
   }
-  #reveal button{
-    margin-top:20px;
-    padding:12px 18px;
+  .endTitle{
+    font-weight:700;
+    font-size:18px;
+    margin:0 0 8px;
+  }
+  .endSub{
+    margin:0 0 14px;
+    color:#cfcfcf;
+    font-size:14px;
+    line-height:1.45;
+  }
+  .endBtn{
+    width:100%;
+    padding:12px 14px;
     border-radius:14px;
     border:none;
-    background:#00ff66;
-    color:#000;
+    background:#3a82f7;
+    color:#fff;
     font-weight:700;
+    cursor:pointer;
+  }
+  .tiny{
+    margin-top:10px;
+    font-size:12px;
+    color:#9a9a9a;
   }
 </style>
 </head>
 <body>
+
+<div id="flash"></div>
 
 <div class="appbar">Media Viewer</div>
 
@@ -153,61 +195,75 @@
 <div class="dialog" id="dialog1">
   <h3>Storage Issue</h3>
   <p>There was a problem loading this media.</p>
-  <button onclick="nextStage()">OK</button>
+  <button id="d1ok">OK</button>
 </div>
 
 <div class="dialog" id="dialog2">
   <h3>System Sync</h3>
   <p>Attempting to recover file…</p>
-  <button onclick="nextStage2()">Continue</button>
+  <button id="d2ok">Continue</button>
 </div>
 
-<div id="reveal">
-  <div>
-    <h1>YOU’VE BEEN TAPPED 😈</h1>
-    <button onclick="location.href='report.html'">VIEW FULL REPORT</button>
+<!-- Neutral ending: button to report page -->
+<div id="ending" aria-hidden="true">
+  <div class="endCard">
+    <p class="endTitle">Media could not be opened</p>
+    <p class="endSub">A quick report is available for this session.</p>
+    <button class="endBtn" id="goReport">View report</button>
+    <div class="tiny">If sound didn’t play, tap once before the report loads.</div>
   </div>
 </div>
 
 <script>
-const statusEl = document.getElementById("status");
-const box = document.getElementById("box");
+  // ===== CONFIG =====
+  const REPORT_URL = "./report.html?src=main";
 
-setTimeout(()=>{
-  statusEl.textContent = "Loading preview…";
-},1500);
+  const statusEl = document.getElementById("status");
+  const box = document.getElementById("box");
+  const flash = document.getElementById("flash");
 
-setTimeout(()=>{
-  document.getElementById("dialog1").style.display="block";
-},3500);
+  function doFlash(){
+    flash.style.opacity = "0.85";
+    setTimeout(()=> flash.style.opacity = "0", 90);
+  }
 
-function nextStage(){
-  document.getElementById("dialog1").style.display="none";
-  document.getElementById("dialog2").style.display="block";
-}
+  // Short, snappy pacing
+  setTimeout(()=>{ statusEl.textContent = "Loading preview…"; }, 1100);
+  setTimeout(()=>{ document.getElementById("dialog1").style.display="block"; }, 2600);
 
-function nextStage2(){
-  document.getElementById("dialog2").style.display="none";
-  glitchSequence();
-}
+  document.getElementById("d1ok").addEventListener("click", ()=>{
+    document.getElementById("dialog1").style.display="none";
+    document.getElementById("dialog2").style.display="block";
+  });
 
-function glitchSequence(){
-  statusEl.textContent="System stabilising…";
-  box.classList.add("glitch");
-  if(navigator.vibrate) navigator.vibrate([80,40,80]);
-  setTimeout(()=>{
-    statusEl.textContent="Unexpected display error";
-  },1200);
-  setTimeout(()=>{
-    box.classList.remove("glitch");
-    showReveal();
-  },3500);
-}
+  document.getElementById("d2ok").addEventListener("click", ()=>{
+    document.getElementById("dialog2").style.display="none";
+    glitchSequence();
+  });
 
-function showReveal(){
-  document.getElementById("mainUI").style.display="none";
-  document.getElementById("reveal").style.display="flex";
-}
+  function glitchSequence(){
+    statusEl.textContent="System stabilising…";
+    box.classList.add("glitch");
+    doFlash();
+    if(navigator.vibrate) navigator.vibrate([60,40,60]);
+
+    setTimeout(()=>{ statusEl.textContent="Unexpected display error"; doFlash(); }, 850);
+    setTimeout(()=>{ statusEl.textContent="Retrying…"; }, 1500);
+
+    setTimeout(()=>{
+      box.classList.remove("glitch");
+      showEnding();
+    }, 2600);
+  }
+
+  function showEnding(){
+    document.getElementById("ending").style.display="flex";
+    document.getElementById("ending").setAttribute("aria-hidden","false");
+  }
+
+  document.getElementById("goReport").addEventListener("click", ()=>{
+    location.href = REPORT_URL;
+  });
 </script>
 
 </body>
