@@ -130,7 +130,7 @@
     align-items:center; justify-content:center;
     background: rgba(0,0,0,.55);
     backdrop-filter: blur(10px);
-    z-index:200;
+    z-index:400; /* was 200 - so report dialog can overlay the face image */
     padding:18px;
   }
   .dialog{
@@ -199,6 +199,7 @@
     background:#000;
     align-items:center;
     justify-content:center;
+    pointer-events:none; /* IMPORTANT: lets report dialog buttons work on top */
   }
   #scare.show{ display:flex; }
 
@@ -236,7 +237,6 @@
     100% { transform: scale(1.45); }
   }
 
-  /* Eye flicker overlay (assumes face is centered) */
   .eyes{
     position:absolute; inset:0;
     pointer-events:none;
@@ -250,7 +250,6 @@
     animation: eyeFlicker 0.22s infinite steps(2, end);
   }
 
-  /* Two eye glows using radial gradients */
   .eyes::before,
   .eyes::after{
     content:"";
@@ -326,30 +325,6 @@
     60%{opacity:0}
     100%{opacity:0}
   }
-
-  /* ===== FINAL MESSAGE OVERLAY (added) ===== */
-  .finalMsg{
-    position:fixed;
-    left:18px; right:18px;
-    bottom: calc(18px + env(safe-area-inset-bottom));
-    padding:14px 16px;
-    border-radius:16px;
-    background: rgba(0,0,0,.55);
-    border:1px solid rgba(255,255,255,.12);
-    color:#fff;
-    font-weight:800;
-    letter-spacing:.02em;
-    text-align:center;
-    opacity:0;
-    transform: translateY(10px);
-    transition: opacity .25s ease, transform .25s ease;
-    z-index:9999;
-    pointer-events:none;
-  }
-  .finalMsg.show{
-    opacity:1;
-    transform: translateY(0);
-  }
 </style>
 </head>
 
@@ -405,9 +380,6 @@
     <div class="strobe" aria-hidden="true"></div>
     <div class="edgeV" aria-hidden="true"></div>
   </div>
-
-  <!-- FINAL MESSAGE (added) -->
-  <div class="finalMsg" id="finalMsg">😂 GOT YOU</div>
 </div>
 
 <!-- Dialogs -->
@@ -434,10 +406,11 @@
 
 <script>
 /* ========= CONFIG ========= */
-const REPORT_URL = "../../report.html?src=scenario-b";
+/* report page is now index.html inside /report/ */
+const REPORT_URL = "/message-media-space/report/?src=scenario-b";
 const FACE_IMAGE = "faceslam.png"; // in same folder
 
- /* ========= sleep + timer manager (FIXES GAP / BACKGROUND TIMERS) ========= */
+/* ========= sleep + timer manager (FIXES GAP / BACKGROUND TIMERS) ========= */
 function sleep(ms){ return new Promise(res => setTimeout(res, ms)); }
 const timers = [];
 function later(fn, ms){
@@ -771,7 +744,6 @@ function glitchHit(ms=520){
 /* ========= FACE SLAM (IMAGE) ========= */
 const scare = document.getElementById("scare");
 const slamBox = document.getElementById("slamBox");
-const finalMsgEl = document.getElementById("finalMsg"); // added
 
 // Preload image (so there’s no blank flash)
 const preload = new Image();
@@ -784,9 +756,6 @@ async function faceSlam(){
   slamBusy = true;
 
   await arm();
-
-  // reset final message (added)
-  if(finalMsgEl) finalMsgEl.classList.remove("show");
 
   // Build-up
   msgEl.textContent = "Re-syncing…";
@@ -820,13 +789,9 @@ async function faceSlam(){
   const HOLD_MS = 3000;
   await sleep(HOLD_MS);
 
-  // show final message on top (added)
-  if(finalMsgEl) finalMsgEl.classList.add("show");
-
-  // IMPORTANT: do NOT hide overlay (removed lines only)
-  // scare.classList.remove("show");
-  // scare.setAttribute("aria-hidden","true");
-  // slamBox.classList.remove("hit", "prep");
+  // IMPORTANT CHANGE:
+  // Do NOT hide the overlay anymore — keep the image on screen.
+  // (No scare.classList.remove("show") here)
 
   slamBusy = false;
 }
@@ -856,6 +821,7 @@ document.getElementById("d1ok").addEventListener("click", async ()=>{
   msgEl.textContent = "Continuing…";
   modeEl.textContent = "ANALYSE";
 
+  // Slam, then show the report dialog on top of the image
   await faceSlam();
 
   msgEl.textContent = "Viewer error detected";
