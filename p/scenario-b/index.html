@@ -224,25 +224,19 @@
   }
 
 .slam.hit{
-  animation: slamHit .85s cubic-bezier(.05,.95,.05,1) forwards,
+  animation: slamHit 1.4s cubic-bezier(.05,.95,.05,1) forwards,
              slamJitter .16s infinite;
 }
 
 
-  }
-  @keyframes slamHit{
-    0%{ transform: scale(.92); }
-    35%{ transform: scale(1.32); }
-    70%{ transform: scale(1.18); }
-    100%{ transform: scale(1.22); }
-  }
-  @keyframes slamHit{
+@keyframes slamHit{
   0%   { transform: scale(.88); }
-  30%  { transform: scale(1.15); }
-  55%  { transform: scale(1.28); }
-  75%  { transform: scale(1.22); }
-  100% { transform: scale(1.25); }
+  30%  { transform: scale(1.20); }
+  55%  { transform: scale(1.45); }
+  75%  { transform: scale(1.38); }
+  100% { transform: scale(1.45); }
 }
+
 
 
   /* Eye flicker overlay (assumes face is centered) */
