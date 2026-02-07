@@ -3,254 +3,714 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#111111" />
-<title>Report</title>
-<meta name="description" content="Session report" />
+<meta name="theme-color" content="#0b0f1a" />
+<title>Quick Reality Check</title>
+
+<!-- ========= SHARE META (keep neutral / not giveaway) ========= -->
+<meta name="description" content="Quick reality check. Nothing happened to your phone." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Quick Reality Check" />
+<meta property="og:description" content="Quick reality check. Nothing happened to your phone." />
+<meta property="og:image" content="https://xstajayx.github.io/message-media-space/previewb.png" />
+<meta property="og:url" content="https://xstajayx.github.io/message-media-space/report.html" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Quick Reality Check" />
+<meta name="twitter:description" content="Quick reality check. Nothing happened to your phone." />
+<meta name="twitter:image" content="https://xstajayx.github.io/message-media-space/previewb.png" />
 
 <style>
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{
-    margin:0;
-    background:#0f0f10;
-    color:#fff;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  }
-  .wrap{
-    max-width:980px;
-    margin:0 auto;
-    padding:16px 14px calc(24px + env(safe-area-inset-bottom));
+  :root{
+    --bg0:#0b0f1a;
+    --bg1:#0a1226;
+    --card: rgba(255,255,255,.06);
+    --card2: rgba(255,255,255,.08);
+    --stroke: rgba(255,255,255,.10);
+    --stroke2: rgba(255,255,255,.14);
+    --txt: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.72);
+    --muter: rgba(255,255,255,.58);
+    --brand: #3a82f7;
+    --brand2:#7c3aed;
+    --good:#34c759;
+    --warn:#ff3b30;
+    --shadow: 0 24px 90px rgba(0,0,0,.55);
+    --r: 24px;
   }
 
-  /* App style header */
-  .appbar{
-    position:sticky;
-    top:0;
-    z-index:10;
-    height:56px;
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    color: var(--txt);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(1000px 600px at 10% 0%, rgba(124,58,237,.22), transparent 58%),
+      radial-gradient(900px 520px at 90% 10%, rgba(58,130,247,.20), transparent 62%),
+      radial-gradient(900px 520px at 50% 110%, rgba(52,199,89,.14), transparent 65%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    overflow-x:hidden;
+  }
+
+  .wrap{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 18px 14px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .topbar{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 16px;
-    background:rgba(28,28,30,.92);
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
     backdrop-filter: blur(10px);
-    border-bottom:1px solid rgba(255,255,255,.06);
   }
-  .appbar .t{font-weight:700; letter-spacing:.2px;}
-  .chip{
-    font-size:12px;
-    color:#d8d8d8;
-    padding:8px 10px;
-    border-radius:999px;
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    min-width:0;
+  }
+
+  .logo{
+    width: 40px; height: 40px;
+    border-radius: 14px;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
+      linear-gradient(135deg, rgba(58,130,247,.95), rgba(124,58,237,.95));
+    box-shadow: 0 12px 40px rgba(58,130,247,.14);
+    border:1px solid rgba(255,255,255,.14);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .logo::after{
+    content:"";
+    position:absolute; inset:-30%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+    transform: rotate(25deg);
+    animation: shine 2.2s infinite ease-in-out;
+    opacity:.65;
+  }
+  @keyframes shine{
+    0%{ transform: translateX(-40%) rotate(25deg); opacity:.0; }
+    25%{ opacity:.8; }
+    55%{ opacity:.5; }
+    100%{ transform: translateX(40%) rotate(25deg); opacity:.0; }
+  }
+
+  .brandText{ min-width:0; }
+  .brandText .t{
+    font-weight: 800;
+    letter-spacing: .2px;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
+  .brandText .s{
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pill{
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
     border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.04);
+    font-size: 12px;
+    color: var(--muted);
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    user-select:none;
   }
 
-  .card{
-    background:#1c1c1e;
-    border:1px solid rgba(255,255,255,.07);
-    border-radius:20px;
-    padding:16px;
-    box-shadow:0 18px 50px rgba(0,0,0,.45);
-    margin-top:12px;
-  }
-
-  h1{
-    margin:0 0 6px;
-    font-size:22px;
-    letter-spacing:.2px;
-  }
-  .sub{margin:0; color:#cfcfcf; font-size:14px; line-height:1.45;}
-
-  .ok{
-    margin-top:12px;
-    padding:12px;
-    border-radius:16px;
-    background:rgba(0,255,102,.10);
-    border:1px solid rgba(0,255,102,.20);
-    color:#dfffe9;
-    font-size:14px;
-    line-height:1.45;
-  }
-
-  .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
-  .btn{
-    padding:12px 14px;
-    border-radius:14px;
-    border:none;
-    font-weight:750;
-    cursor:pointer;
-  }
-  .btnPrimary{ background:#3a82f7; color:#fff; }
-  .btnGhost{
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.10);
-    color:#fff;
+  .dot{
+    width: 8px; height: 8px;
+    border-radius: 999px;
+    background: var(--good);
+    box-shadow: 0 0 14px rgba(52,199,89,.35);
   }
 
   .grid{
+    margin-top: 14px;
     display:grid;
-    grid-template-columns:1fr;
-    gap:12px;
-    margin-top:12px;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
-  @media(min-width:860px){ .grid{ grid-template-columns:1fr 1fr; } }
+  @media(min-width: 860px){
+    .grid{ grid-template-columns: 1.25fr .75fr; align-items:start; }
+  }
 
-  .ad{
-    height:140px;
-    border-radius:18px;
-    border:1px dashed rgba(255,255,255,.18);
+  .card{
+    border-radius: var(--r);
+    background: var(--card);
+    border: 1px solid var(--stroke);
+    box-shadow: var(--shadow);
+    padding: 16px 14px;
+    position: relative;
+    overflow:hidden;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(500px 160px at 10% 0%, rgba(255,255,255,.10), transparent 60%),
+      radial-gradient(450px 160px at 90% 0%, rgba(255,255,255,.08), transparent 60%);
+    pointer-events:none;
+    opacity:.7;
+  }
+
+  .hero{
+    padding: 18px 16px;
+  }
+
+  .hero h1{
+    margin: 4px 0 8px;
+    font-size: clamp(22px, 4.7vw, 40px);
+    letter-spacing: -0.3px;
+  }
+
+  .hero p{
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 15px;
+  }
+
+  .okline{
+    margin-top: 12px;
+    display:flex;
+    gap: 10px;
+    flex-wrap:wrap;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 999px;
+    background: rgba(52,199,89,.10);
+    border: 1px solid rgba(52,199,89,.20);
+    color: rgba(219,255,230,.92);
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  .badge .ic{
+    width: 18px; height: 18px;
+    border-radius: 6px;
+    background: rgba(52,199,89,.18);
     display:flex;
     align-items:center;
     justify-content:center;
-    color:#bdbdbd;
-    background:rgba(0,0,0,.18);
-    font-weight:650;
+    font-size: 12px;
   }
 
-  .scenario{
-    border-radius:18px;
+  .mutebox{
+    margin-top: 12px;
+    padding: 12px 12px;
+    border-radius: 18px;
+    border:1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    color: var(--muted);
+    line-height: 1.55;
+    font-size: 14px;
+  }
+
+  .mutebox b{ color: var(--txt); }
+
+  .btnrow{
+    margin-top: 14px;
+    display:flex;
+    gap: 10px;
+    flex-wrap:wrap;
+    position:relative;
+    z-index: 1;
+  }
+
+  .btn{
+    border:none;
+    border-radius: 16px;
+    padding: 12px 14px;
+    font-weight: 800;
+    cursor:pointer;
+    color:#fff;
+    letter-spacing: .2px;
+    display:inline-flex;
+    align-items:center;
+    gap: 8px;
+    user-select:none;
+    transition: transform .08s ease, filter .08s ease;
+  }
+  .btn:active{ transform: translateY(1px) scale(.99); }
+
+  .btnPrimary{
+    background: linear-gradient(135deg, var(--brand), var(--brand2));
+    box-shadow: 0 18px 50px rgba(58,130,247,.18);
+  }
+  .btnGhost{
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    color: rgba(255,255,255,.92);
+  }
+  .btnLight{
+    background: rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.12);
+    color: rgba(255,255,255,.92);
+  }
+
+  .btn .emoji{ filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+
+  .mini{
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muter);
+    line-height: 1.45;
+  }
+
+  .side{
+    display:grid;
+    gap: 12px;
+  }
+
+  .list{
+    display:grid;
+    gap: 10px;
+  }
+
+  .item{
+    display:flex;
+    gap: 12px;
+    align-items:flex-start;
+    padding: 12px 12px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.05);
     border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.03);
-    padding:14px;
   }
-  .scenario .name{font-weight:800; margin:0 0 6px; letter-spacing:.2px;}
-  .scenario .desc{margin:0 0 12px; color:#cfcfcf; font-size:13px; line-height:1.45;}
-  .scenario .mini{color:#a9a9a9; font-size:12px; margin-top:10px;}
 
-  .foot{
-    margin-top:14px;
-    color:#9b9b9b;
-    font-size:12px;
+  .item .ico{
+    width: 38px; height: 38px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 18px;
+  }
+
+  .item .tt{
+    font-weight: 800;
+    margin: 0;
+    font-size: 14px;
+    letter-spacing:.1px;
+  }
+  .item .ss{
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .pranks{
+    margin-top: 12px;
+  }
+
+  .prGrid{
+    margin-top: 10px;
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  @media(min-width: 860px){
+    .prGrid{ grid-template-columns: 1fr 1fr; }
+  }
+
+  .prCard{
+    border-radius: 18px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    overflow:hidden;
+    position:relative;
+  }
+  .prTop{
+    padding: 12px 12px 10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .prName{
+    font-weight: 900;
+    letter-spacing: .2px;
+    font-size: 14px;
+  }
+  .prTag{
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    color: var(--muted);
+    white-space:nowrap;
+  }
+  .prBody{
+    padding: 0 12px 12px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .prBtnRow{
+    padding: 0 12px 12px;
+    display:flex;
+    gap: 8px;
+    flex-wrap:wrap;
+  }
+  .prBtn{
+    flex: 1 1 auto;
+    min-width: 130px;
+    border:none;
+    border-radius: 14px;
+    padding: 10px 12px;
+    font-weight: 850;
+    cursor:pointer;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    color: rgba(255,255,255,.92);
+  }
+  .prBtn.primary{
+    background: linear-gradient(135deg, rgba(58,130,247,.95), rgba(124,58,237,.95));
+    border:none;
+  }
+
+  .footer{
+    margin-top: 14px;
     text-align:center;
+    color: rgba(255,255,255,.50);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  /* subtle confetti pop when they land */
+  .pop{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index: 999;
+    opacity:0;
+    transition: opacity .2s ease;
+  }
+  .pop.show{ opacity:1; }
+  .confetti{
+    position:absolute;
+    width: 6px; height: 10px;
+    border-radius: 2px;
+    opacity:.9;
+    animation: fall 1.6s ease-out forwards;
+  }
+  @keyframes fall{
+    0%{ transform: translateY(-20px) rotate(0deg); opacity:0; }
+    15%{ opacity:1; }
+    100%{ transform: translateY(680px) rotate(480deg); opacity:0; }
   }
 </style>
 </head>
+
 <body>
-
-<div class="appbar">
-  <div class="t">Report</div>
-  <div class="chip" id="srcChip">Session</div>
-</div>
-
 <div class="wrap">
 
-  <div class="card">
-    <h1>It’s a prank 😄</h1>
-    <p class="sub">
-      What you saw was a <b>fake glitch simulation</b> made with normal web animations.
-      It can’t access your photos, messages, or device data.
-    </p>
-
-    <div class="ok">
-      ✅ Nothing was hacked.<br>
-      ✅ No files were touched.<br>
-      ✅ It’s just a convincing UI + effects.
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="brandText">
+        <div class="t">Quick Reality Check</div>
+        <div class="s" id="subtitle">Nothing happened to your phone.</div>
+      </div>
     </div>
-
-    <div class="row">
-      <button class="btn btnPrimary" id="shareBtn">Send to a friend</button>
-      <button class="btn btnGhost" id="runAgain">Run again</button>
+    <div class="pill" title="Status">
+      <span class="dot" aria-hidden="true"></span>
+      SAFE
     </div>
-
-    <div class="foot">Tip: don’t explain it — just say “open this” 😈</div>
-  </div>
-
-  <!-- AD SLOT (you’ll replace with your AdSense code) -->
-  <div class="card">
-    <div class="ad">Ad slot (AdSense)</div>
-    <div class="foot">Place your ad code here (top performs best).</div>
   </div>
 
   <div class="grid">
-    <!-- Scenarios (clean, kid-friendly wording) -->
-    <div class="card">
-      <h1 style="font-size:18px;">Try another</h1>
-      <p class="sub">Different vibe, same surprise.</p>
 
-      <div class="scenario" style="margin-top:12px;">
-        <p class="name">Scenario A</p>
-        <p class="desc">The classic “media viewer” glitch (quick + believable).</p>
-        <div class="row">
-          <button class="btn btnPrimary" data-go="./">Open</button>
-        </div>
-        <div class="mini">Share preview can be different per scenario later.</div>
+    <!-- MAIN -->
+    <div class="card hero">
+      <h1>Gotcha 😄</h1>
+      <p>
+        If that page looked scary — <b>it was just a prank</b>.
+        It can’t access your photos, camera, contacts, files, microphone, location, or anything on your device.
+      </p>
+
+      <div class="okline">
+        <div class="badge"><span class="ic">✅</span> No data accessed</div>
+        <div class="badge"><span class="ic">🔒</span> Nothing installed</div>
+        <div class="badge"><span class="ic">🧠</span> Just visuals + sound</div>
       </div>
 
-      <div class="scenario" style="margin-top:10px;">
-        <p class="name">Scenario B</p>
-        <p class="desc">More popups + bigger glitch (still short).</p>
-        <div class="row">
-          <button class="btn btnPrimary" data-go="./p/scenario-b/">Open</button>
-        </div>
+      <div class="mutebox">
+        <b>Why did it feel real?</b><br>
+        Modern browsers allow pages to do dramatic things: fullscreen, vibration, audio (after a tap), animations and fake “UI”.
+        That’s all this is — a mini interactive horror clip.
       </div>
 
-      <div class="scenario" style="margin-top:10px;">
-        <p class="name">Scenario C</p>
-        <p class="desc">Silent mode (no sound) but feels real.</p>
-        <div class="row">
-          <button class="btn btnPrimary" data-go="./p/scenario-c/">Open</button>
-        </div>
+      <div class="btnrow">
+        <button class="btn btnPrimary" id="tryAnother"><span class="emoji">🎭</span> Try another</button>
+        <button class="btn btnGhost" id="sendBack"><span class="emoji">😈</span> Send one back</button>
+        <button class="btn btnLight" id="replay"><span class="emoji">🔁</span> Replay</button>
+      </div>
+
+      <div class="mini" id="fromLine">
+        Tip: if audio didn’t play, it’s because browsers require a tap first.
       </div>
     </div>
 
-    <!-- Another ad slot + your games -->
-    <div class="card">
-      <h1 style="font-size:18px;">Support my projects</h1>
-      <p class="sub">If you enjoyed it, my games help keep this stuff coming.</p>
+    <!-- SIDE -->
+    <div class="side">
 
-      <div class="row" style="margin-top:12px;">
-        <button class="btn btnPrimary" id="btnOverrun">Overrun</button>
-        <button class="btn btnGhost" id="btnDarts">Darts Master</button>
+      <div class="card">
+        <div class="list">
+          <div class="item">
+            <div class="ico">🧯</div>
+            <div>
+              <p class="tt">Quick sanity checklist</p>
+              <p class="ss">Nothing was hacked. If you ever worry: close the tab, toggle airplane mode, restart. You’re fine.</p>
+            </div>
+          </div>
+          <div class="item">
+            <div class="ico">🧩</div>
+            <div>
+              <p class="tt">How this works</p>
+              <p class="ss">It’s just a webpage using animation + sound + fake messages. No phone permissions were granted.</p>
+            </div>
+          </div>
+          <div class="item">
+            <div class="ico">🧒</div>
+            <div>
+              <p class="tt">Keep it fun</p>
+              <p class="ss">Use with friends who’ll laugh. Don’t use on people who panic easily.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="ad" style="margin-top:14px;">Ad slot (AdSense)</div>
-      <div class="foot">Second slot helps once traffic grows.</div>
+      <!-- OPTIONAL MONETISATION SLOT -->
+      <div class="card">
+        <p style="margin:0 0 8px; font-weight:900; letter-spacing:.2px;">Support the creator</p>
+        <p style="margin:0; color:var(--muted); font-size:13px; line-height:1.45;">
+          This page is designed to scale to 100+ pranks.
+          Once you add ads, the “report” page is the safe, friendly place people will stick around.
+        </p>
+        <div style="margin-top:12px; border-radius:18px; padding:18px; text-align:center; color:rgba(255,255,255,.60);
+                    border:1px dashed rgba(255,255,255,.16); background: rgba(255,255,255,.03);">
+          AD SLOT (add later)
+        </div>
+        <div class="mini">Replace this with AdSense/other web ads once approved.</div>
+      </div>
+
     </div>
   </div>
 
-  <div class="foot">Built by Jworldcreations</div>
+  <!-- prank suggestions -->
+  <div class="card pranks">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div>
+        <div style="font-weight:950; font-size:16px; letter-spacing:.1px;">More pranks</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:4px;">Pick one — the page you share won’t reveal what happens.</div>
+      </div>
+      <div class="pill" id="countPill" title="How many pranks are available">0 available</div>
+    </div>
+
+    <div class="prGrid" id="prGrid"></div>
+
+    <div class="footer">
+      Built as a “universal report page” — works for any scenario: <span style="color:rgba(255,255,255,.72)">report.html?from=anything</span>
+    </div>
+  </div>
+
 </div>
 
+<div class="pop" id="pop"></div>
+
 <script>
-  const ROOT = "https://xstajayx.github.io/message-media-space/";
-  const OVERUN_URL = "https://play.google.com/store/apps/details?id=com.jworldcreations.overrun";
-  const DARTS_URL  = "https://play.google.com/store/apps/details?id=com.jworldcreations.dartsmaster";
+/* =======================
+   UNIVERSAL REPORT PAGE
+   - Works for any prank via: report.html?from=scenario-b (etc)
+   - Scales to 100+ pranks: just add entries to PRANKS array
+   ======================= */
 
-  // Show which prank sent them here (optional)
-  const params = new URLSearchParams(location.search);
-  const src = params.get("src") || "main";
-  document.getElementById("srcChip").textContent = "Session: " + src;
+const params = new URLSearchParams(location.search);
+const from = params.get("from") || params.get("src") || "unknown";
 
-  // Run again
-  document.getElementById("runAgain").addEventListener("click", ()=> location.href = ROOT);
+// Base site (GitHub Pages root)
+const BASE = "https://xstajayx.github.io/message-media-space";
 
-  // Scenario buttons
-  document.querySelectorAll("[data-go]").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      const path = b.getAttribute("data-go");
-      location.href = new URL(path, ROOT).toString();
+// Add / maintain pranks here (you can grow this list to 100+)
+const PRANKS = [
+  {
+    id: "scenario-a",
+    name: "Message Preview",
+    vibe: "Looks like a normal message / media preview.",
+    path: "/p/scenario-a/",
+    tag: "SAFE"
+  },
+  {
+    id: "scenario-b",
+    name: "CCTV Viewer",
+    vibe: "Camera viewer glitch + sudden slam (tap to arm).",
+    path: "/p/scenario-b/",
+    tag: "JUMPSCARE"
+  },
+  // Add more later:
+  // { id:"spider", name:"Spider Run", vibe:"A spider crawls across your screen.", path:"/p/spider/", tag:"GROSS" },
+  // { id:"upside", name:"Upside Down", vibe:"Everything flips and breaks.", path:"/p/upside-down/", tag:"GLITCH" },
+];
+
+const grid = document.getElementById("prGrid");
+const pill = document.getElementById("countPill");
+pill.textContent = `${PRANKS.length} available`;
+
+function confettiPop(){
+  const pop = document.getElementById("pop");
+  pop.innerHTML = "";
+  const count = 26;
+  for(let i=0;i<count;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = (Math.random()*100) + "vw";
+    c.style.top = (-10 - Math.random()*40) + "px";
+    // browser chooses default colors – we avoid hardcoding per your style prefs elsewhere,
+    // but confetti without colors looks dead, so we use a small palette:
+    const pal = ["rgba(58,130,247,.92)","rgba(124,58,237,.92)","rgba(52,199,89,.92)","rgba(255,255,255,.85)"];
+    c.style.background = pal[Math.floor(Math.random()*pal.length)];
+    c.style.animationDelay = (Math.random()*0.2) + "s";
+    c.style.transform = `translateY(-10px) rotate(${Math.random()*80}deg)`;
+    pop.appendChild(c);
+  }
+  pop.classList.add("show");
+  setTimeout(()=>pop.classList.remove("show"), 650);
+}
+confettiPop();
+
+// Friendly line that doesn’t reveal the prank, but helps with debugging/analytics
+const fromLine = document.getElementById("fromLine");
+if(from && from !== "unknown"){
+  fromLine.textContent = "You’re safe. This was an interactive prank page (visuals + sound only).";
+}
+
+// Render prank cards
+function renderPranks(){
+  grid.innerHTML = "";
+  PRANKS.forEach(p=>{
+    const card = document.createElement("div");
+    card.className = "prCard";
+    card.innerHTML = `
+      <div class="prTop">
+        <div class="prName">${escapeHtml(p.name)}</div>
+        <div class="prTag">${escapeHtml(p.tag || "PRANK")}</div>
+      </div>
+      <div class="prBody">${escapeHtml(p.vibe)}</div>
+      <div class="prBtnRow">
+        <button class="prBtn primary" data-go="${p.id}">Open</button>
+        <button class="prBtn" data-share="${p.id}">Share</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll("[data-go]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-go");
+      const p = PRANKS.find(x=>x.id===id);
+      if(!p) return;
+      location.href = BASE + p.path;
     });
   });
 
-  // Share the prank (not the report)
-  document.getElementById("shareBtn").addEventListener("click", async ()=>{
-    const shareData = {
-      title: "Wait… look at this",
-      text: "Can you check this for me?",
-      url: ROOT
-    };
-    if(navigator.share){
-      try{ await navigator.share(shareData); }catch(e){}
-    }else{
-      try{ await navigator.clipboard.writeText(ROOT); alert("Link copied."); }
-      catch(e){ prompt("Copy link:", ROOT); }
-    }
+  grid.querySelectorAll("[data-share]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const id = btn.getAttribute("data-share");
+      const p = PRANKS.find(x=>x.id===id);
+      if(!p) return;
+
+      // Share text is neutral and does NOT say prank
+      const shareUrl = BASE + p.path;
+      const shareData = {
+        title: "Have a look at this…",
+        text: "Have a look at this…",
+        url: shareUrl
+      };
+
+      try{
+        if(navigator.share){
+          await navigator.share(shareData);
+        }else{
+          await navigator.clipboard.writeText(shareUrl);
+          alert("Link copied.");
+        }
+      }catch(e){}
+    });
   });
+}
+renderPranks();
 
-  // Games
-  document.getElementById("btnOverrun").addEventListener("click", ()=> window.open(OVERUN_URL, "_blank"));
-  document.getElementById("btnDarts").addEventListener("click", ()=> window.open(DARTS_URL, "_blank"));
+// Choose a "different" prank to try (avoid sending them back to the same one)
+function pickAnother(){
+  if(PRANKS.length === 1) return PRANKS[0];
+  const pool = PRANKS.filter(p => p.id !== from);
+  return pool[Math.floor(Math.random()*pool.length)] || PRANKS[0];
+}
+
+document.getElementById("tryAnother").addEventListener("click", ()=>{
+  const p = pickAnother();
+  location.href = BASE + p.path;
+});
+
+document.getElementById("replay").addEventListener("click", ()=>{
+  // If we know where they came from, send them back
+  const p = PRANKS.find(x=>x.id===from);
+  if(p) location.href = BASE + p.path;
+  else location.href = BASE + "/"; // fallback
+});
+
+document.getElementById("sendBack").addEventListener("click", async ()=>{
+  // Send a "neutral" share that doesn't reveal it’s a prank.
+  const p = pickAnother();
+  const shareUrl = BASE + p.path;
+
+  const shareData = {
+    title: "Quick question…",
+    text: "Quick question… can you see this?",
+    url: shareUrl
+  };
+
+  try{
+    if(navigator.share){
+      await navigator.share(shareData);
+    }else{
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Link copied.");
+    }
+  }catch(e){}
+});
+
+/* ===== helpers ===== */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+  }[c]));
+}
 </script>
-
 </body>
 </html>
