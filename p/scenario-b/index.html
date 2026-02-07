@@ -223,9 +223,12 @@
     to{ transform: scale(.92); opacity: 1; }
   }
 
-  .slam.hit{
-    animation: slamHit .42s cubic-bezier(.05,.95,.05,1) forwards,
-               slamJitter .08s infinite;
+.slam.hit{
+  animation: slamHit .85s cubic-bezier(.05,.95,.05,1) forwards,
+             slamJitter .16s infinite;
+}
+
+
   }
   @keyframes slamHit{
     0%{ transform: scale(.92); }
@@ -233,13 +236,14 @@
     70%{ transform: scale(1.18); }
     100%{ transform: scale(1.22); }
   }
-  @keyframes slamJitter{
-    0%{ transform: translate(0,0) scale(1.22); }
-    25%{ transform: translate(3px,-2px) scale(1.23); }
-    50%{ transform: translate(-3px,2px) scale(1.21); }
-    75%{ transform: translate(2px,3px) scale(1.23); }
-    100%{ transform: translate(0,0) scale(1.22); }
-  }
+  @keyframes slamHit{
+  0%   { transform: scale(.88); }
+  30%  { transform: scale(1.15); }
+  55%  { transform: scale(1.28); }
+  75%  { transform: scale(1.22); }
+  100% { transform: scale(1.25); }
+}
+
 
   /* Eye flicker overlay (assumes face is centered) */
   .eyes{
@@ -251,9 +255,9 @@
   }
 
   .slam.hit .eyes{
-    opacity: 1;
-    animation: eyeFlicker 0.13s infinite steps(2, end);
-  }
+  opacity: 1;
+  animation: eyeFlicker 0.22s infinite steps(2, end);
+}
 
   /* Two eye glows using radial gradients */
   .eyes::before,
@@ -781,7 +785,7 @@ async function faceSlam(){
   }, 170);
 
   // KEEP ON SCREEN for 2.5 seconds
-  const HOLD_MS = 2500;
+  const HOLD_MS = 3200; // 3.2 seconds
 
   setTimeout(()=>{
     scare.classList.remove("show");
