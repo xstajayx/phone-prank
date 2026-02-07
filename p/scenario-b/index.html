@@ -83,6 +83,7 @@
     background:#000;
     box-shadow:0 18px 70px rgba(0,0,0,.6);
     position:relative;
+    transform: translateZ(0);
   }
   canvas{ width:100%; height:100%; display:block; }
 
@@ -164,6 +165,7 @@
     z-index:300;
     transition: opacity .08s linear;
   }
+
   .shake{animation: shake .12s infinite;}
   @keyframes shake{
     0%{transform:translate(0,0)}
@@ -190,7 +192,7 @@
     pointer-events:none;
   }
 
-  /* === JUMPSCARE OVERLAY === */
+  /* === JUMPSCARE OVERLAY (better) === */
   #scare{
     position:fixed; inset:0;
     display:none;
@@ -200,46 +202,71 @@
     justify-content:center;
   }
   #scare.show{ display:flex; }
-  .scareFace{
-    width:min(520px, 96vw);
+
+  .scareWrap{
+    width:min(560px, 96vw);
     aspect-ratio: 1 / 1;
-    border-radius: 24px;
-    background:
-      radial-gradient(circle at 50% 45%, rgba(255,255,255,.95) 0 8%, rgba(0,0,0,0) 9% 100%),
-      radial-gradient(circle at 35% 40%, rgba(255,255,255,.96) 0 9%, rgba(0,0,0,0) 10% 100%),
-      radial-gradient(circle at 65% 40%, rgba(255,255,255,.96) 0 9%, rgba(0,0,0,0) 10% 100%),
-      radial-gradient(circle at 50% 66%, rgba(255,255,255,.90) 0 10%, rgba(0,0,0,0) 11% 100%),
-      radial-gradient(circle at 50% 58%, rgba(255,255,255,.08) 0 52%, rgba(0,0,0,0) 53% 100%),
-      radial-gradient(circle at 50% 50%, rgba(255,255,255,.03) 0 55%, rgba(0,0,0,0) 56% 100%);
-    filter: contrast(1.3) saturate(0.8);
-    box-shadow: 0 0 120px rgba(255,255,255,.10);
-    animation: scareZoom .38s ease-out forwards, scareJitter .08s infinite;
-    position:relative;
+    border-radius: 26px;
     overflow:hidden;
+    position:relative;
+    transform: scale(.88);
+    filter: contrast(1.25) saturate(.85);
+    box-shadow: 0 0 140px rgba(255,255,255,.06);
+    animation: scareIn 1.15s cubic-bezier(.1,.9,.1,1) forwards;
   }
-  .scareFace::after{
-    content:"";
-    position:absolute; inset:-10%;
+  @keyframes scareIn{
+    0%{ transform: scale(.72); opacity: 0; }
+    18%{ transform: scale(1.02); opacity: 1; }
+    55%{ transform: scale(1.10); }
+    100%{ transform: scale(1.06); }
+  }
+
+  #scareCanvas{ width:100%; height:100%; display:block; background:#000; }
+
+  .scareScan{
+    position:absolute; inset:-20%;
     background: repeating-linear-gradient(
       to bottom,
-      rgba(255,255,255,.08),
-      rgba(255,255,255,.08) 2px,
+      rgba(255,255,255,.12),
+      rgba(255,255,255,.12) 1px,
       rgba(0,0,0,0) 4px,
       rgba(0,0,0,0) 7px
     );
-    opacity:.35;
+    mix-blend-mode: screen;
+    opacity:.28;
+    pointer-events:none;
+    transform: translateY(-10%);
+    animation: scanMove .35s infinite linear;
+  }
+  @keyframes scanMove{
+    from{ transform: translateY(-10%); }
+    to{ transform: translateY(10%); }
+  }
+
+  .scareVignette{
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 50% 45%, rgba(0,0,0,0) 35%, rgba(0,0,0,.75) 78%, rgba(0,0,0,.95) 100%);
+    pointer-events:none;
+  }
+
+  /* tiny strobe (limited flashes) */
+  .strobe{
+    position:absolute; inset:0;
+    background:#fff;
+    opacity:0;
+    pointer-events:none;
+    animation: strobe 1.15s ease-out forwards;
     mix-blend-mode: screen;
   }
-  @keyframes scareZoom{
-    from{ transform: scale(0.82); }
-    to{ transform: scale(1.08); }
-  }
-  @keyframes scareJitter{
-    0%{ transform: translate(0,0) scale(1.08); }
-    25%{ transform: translate(2px,-1px) scale(1.09); }
-    50%{ transform: translate(-2px,1px) scale(1.08); }
-    75%{ transform: translate(1px,2px) scale(1.09); }
-    100%{ transform: translate(0,0) scale(1.08); }
+  @keyframes strobe{
+    0%{opacity:0}
+    8%{opacity:.40}
+    14%{opacity:0}
+    22%{opacity:.34}
+    28%{opacity:0}
+    40%{opacity:.22}
+    46%{opacity:0}
+    100%{opacity:0}
   }
 </style>
 </head>
@@ -290,7 +317,12 @@
 
 <!-- Jump scare overlay -->
 <div id="scare" aria-hidden="true">
-  <div class="scareFace" aria-hidden="true"></div>
+  <div class="scareWrap">
+    <canvas id="scareCanvas"></canvas>
+    <div class="scareScan"></div>
+    <div class="strobe"></div>
+    <div class="scareVignette"></div>
+  </div>
 </div>
 
 <!-- Dialogs -->
@@ -329,7 +361,7 @@ function initAudio(){
   if(audioCtx) return;
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   masterGain = audioCtx.createGain();
-  masterGain.gain.value = 0.16;
+  masterGain.gain.value = 0.20;
   masterGain.connect(audioCtx.destination);
 }
 function beep(freq=880, dur=0.06, type="square", gain=0.12){
@@ -346,28 +378,6 @@ function beep(freq=880, dur=0.06, type="square", gain=0.12){
   o.start(t);
   o.stop(t + dur + 0.02);
 }
-function burstNoise(dur=0.22){
-  if(!audioCtx || muted) return;
-  const bufferSize = Math.floor(audioCtx.sampleRate * dur);
-  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i=0;i<bufferSize;i++){
-    // harsh white noise + decay
-    const k = 1 - (i / bufferSize);
-    data[i] = (Math.random()*2-1) * k;
-  }
-  const src = audioCtx.createBufferSource();
-  src.buffer = buffer;
-  const g = audioCtx.createGain();
-  g.gain.value = 0.0001;
-  src.connect(g); g.connect(masterGain);
-  const t = audioCtx.currentTime;
-  g.gain.exponentialRampToValueAtTime(0.22, t+0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-  src.start();
-  src.stop(t+dur+0.05);
-}
-
 async function requestFullscreen(){
   try{
     const el = document.documentElement;
@@ -400,7 +410,97 @@ document.getElementById("muteBtn").addEventListener("click", async ()=>{
   if(!muted) beep(660,0.05,"square",0.10);
 });
 
-/* ========= Fake CCTV feed ========= */
+/* ========= Better “scare” sound ========= */
+function playScareSound(){
+  if(!audioCtx || muted) return;
+
+  const t0 = audioCtx.currentTime;
+
+  // Distortion
+  const shaper = audioCtx.createWaveShaper();
+  const curve = new Float32Array(44100);
+  for(let i=0;i<curve.length;i++){
+    const x = (i*2/curve.length)-1;
+    curve[i] = Math.tanh(6*x);
+  }
+  shaper.curve = curve;
+
+  // Master chain for scare
+  const g = audioCtx.createGain();
+  g.gain.value = 0.0001;
+
+  const hp = audioCtx.createBiquadFilter();
+  hp.type = "highpass";
+  hp.frequency.value = 180;
+
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 600;
+  bp.Q.value = 10;
+
+  g.connect(hp);
+  hp.connect(bp);
+  bp.connect(shaper);
+  shaper.connect(masterGain);
+
+  // Noise buffer
+  const dur = 1.15;
+  const size = Math.floor(audioCtx.sampleRate * dur);
+  const buf = audioCtx.createBuffer(1, size, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<size;i++){
+    // harsher at start, decays
+    const k = 1 - (i/size);
+    data[i] = (Math.random()*2-1) * (0.85*k);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buf;
+
+  // Riser oscillator
+  const osc = audioCtx.createOscillator();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(140, t0);
+  osc.frequency.exponentialRampToValueAtTime(1400, t0 + 0.55);
+  osc.frequency.exponentialRampToValueAtTime(520, t0 + dur);
+
+  // Bass hit
+  const bass = audioCtx.createOscillator();
+  bass.type = "sine";
+  bass.frequency.setValueAtTime(56, t0 + 0.18);
+
+  const bassG = audioCtx.createGain();
+  bassG.gain.setValueAtTime(0.0001, t0);
+  bassG.gain.exponentialRampToValueAtTime(0.32, t0 + 0.18);
+  bassG.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
+
+  // Connect sources
+  noise.connect(g);
+  osc.connect(g);
+  bass.connect(bassG);
+  bassG.connect(masterGain);
+
+  // Envelope
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.35, t0 + 0.08);
+  g.gain.exponentialRampToValueAtTime(0.08, t0 + dur);
+
+  // Filter sweeps (screechy)
+  bp.frequency.setValueAtTime(500, t0);
+  bp.frequency.exponentialRampToValueAtTime(2200, t0 + 0.45);
+  bp.frequency.exponentialRampToValueAtTime(700, t0 + dur);
+
+  // Start/stop
+  noise.start(t0);
+  noise.stop(t0 + dur);
+
+  osc.start(t0);
+  osc.stop(t0 + dur);
+
+  bass.start(t0 + 0.18);
+  bass.stop(t0 + 0.5);
+}
+
+/* ========= CCTV feed ========= */
 const frame = document.getElementById("frame");
 const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d", {alpha:false});
@@ -421,7 +521,7 @@ resize();
 let lastT = performance.now();
 let frames = 0;
 
-let t0 = performance.now();
+let tStart = performance.now();
 let motionState = 0;
 let glitching = false;
 
@@ -440,6 +540,7 @@ function drawScene(time){
   ctx.fillStyle = g;
   ctx.fillRect(0,0,w,h);
 
+  // hallway wedge
   ctx.fillStyle = "rgba(255,255,255,0.05)";
   const mid = w*0.5;
   ctx.beginPath();
@@ -456,7 +557,7 @@ function drawScene(time){
   const img = ctx.getImageData(0,0,w,h);
   const d = img.data;
 
-  const tt = (time - t0)/1000;
+  const tt = (time - tStart)/1000;
   const wave = Math.sin(tt*1.1)*0.5 + 0.5;
 
   for(let i=0;i<d.length;i+=4){
@@ -473,12 +574,14 @@ function drawScene(time){
   const bx = (wave * w*0.2);
   ctx.fillRect(bx, h*0.62, w*0.18, h*0.08);
 
+  // vignette
   const vg = ctx.createRadialGradient(mid,h*0.55, w*0.10, mid,h*0.55, w*0.70);
   vg.addColorStop(0, "rgba(0,0,0,0)");
   vg.addColorStop(1, "rgba(0,0,0,0.65)");
   ctx.fillStyle = vg;
   ctx.fillRect(0,0,w,h);
 
+  // burn-in labels
   ctx.font = "12px ui-monospace, Menlo, Monaco, Consolas, 'Courier New', monospace";
   ctx.fillStyle = "rgba(255,255,255,0.65)";
   ctx.fillText("REC", 12, 20);
@@ -543,15 +646,13 @@ function loop(time){
 requestAnimationFrame(loop);
 
 /* ========= FX helpers ========= */
-function showDialog(id, show){
-  document.getElementById(id).style.display = show ? "flex" : "none";
-}
+function showDialog(id, show){ document.getElementById(id).style.display = show ? "flex" : "none"; }
 function doFlash(){
   const f = document.getElementById("flash");
   f.style.opacity = "0.85";
   setTimeout(()=> f.style.opacity = "0", 90);
 }
-function glitchHit(ms=650){
+function glitchHit(ms=520){
   glitching = true;
   frame.classList.add("shake");
   doFlash();
@@ -564,30 +665,138 @@ function glitchHit(ms=650){
   }, ms);
 }
 
-/* ========= JUMPSCARE ========= */
+/* ========= Better jumpscare visual (draw on canvas) ========= */
+const scare = document.getElementById("scare");
+const scareCanvas = document.getElementById("scareCanvas");
+const sctx = scareCanvas.getContext("2d", {alpha:false});
+let scareRAF = null;
+
+function resizeScare(){
+  const r = scareCanvas.getBoundingClientRect();
+  scareCanvas.width = Math.max(1, Math.floor(r.width));
+  scareCanvas.height = Math.max(1, Math.floor(r.height));
+}
+window.addEventListener("resize", resizeScare);
+resizeScare();
+
+function drawScareFace(t){
+  const w = scareCanvas.width, h = scareCanvas.height;
+  const tt = t/1000;
+
+  // base
+  sctx.fillStyle = "#000";
+  sctx.fillRect(0,0,w,h);
+
+  // moving grain
+  const img = sctx.createImageData(w,h);
+  const d = img.data;
+  const cx = w*0.5 + Math.sin(tt*2.2)*w*0.02;
+  const cy = h*0.48 + Math.cos(tt*1.9)*h*0.02;
+
+  for(let i=0;i<d.length;i+=4){
+    const px = (i/4)%w;
+    const py = ((i/4)/w)|0;
+    const n = (Math.random()*255)|0;
+
+    // radial glow near center
+    const dx = (px-cx)/(w*0.42);
+    const dy = (py-cy)/(h*0.42);
+    const r = Math.max(0, 1 - (dx*dx + dy*dy));
+    const glow = (r*r)*120;
+
+    const v = Math.min(255, (n*0.25) + glow);
+    d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 255;
+  }
+  sctx.putImageData(img,0,0);
+
+  // eyes (bright + unsettling)
+  function eye(ex,ey,rx,ry){
+    const g = sctx.createRadialGradient(ex,ey, 2, ex,ey, rx);
+    g.addColorStop(0, "rgba(255,255,255,0.98)");
+    g.addColorStop(0.35, "rgba(255,255,255,0.55)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    sctx.fillStyle = g;
+    sctx.beginPath();
+    sctx.ellipse(ex,ey, rx, ry, 0, 0, Math.PI*2);
+    sctx.fill();
+
+    // pupil jitter
+    const px = ex + Math.sin(tt*18 + ex*0.01)*rx*0.12;
+    const py = ey + Math.cos(tt*16 + ey*0.01)*ry*0.12;
+    sctx.fillStyle = "rgba(0,0,0,0.95)";
+    sctx.beginPath();
+    sctx.ellipse(px,py, rx*0.22, ry*0.22, 0, 0, Math.PI*2);
+    sctx.fill();
+  }
+
+  const pulse = 1 + Math.sin(tt*7)*0.02;
+  eye(w*0.36, h*0.42, w*0.12*pulse, h*0.09*pulse);
+  eye(w*0.64, h*0.42, w*0.12*pulse, h*0.09*pulse);
+
+  // mouth
+  sctx.strokeStyle = "rgba(255,255,255,0.68)";
+  sctx.lineWidth = Math.max(2, w*0.01);
+  sctx.beginPath();
+  const mx = w*0.5, my = h*0.68;
+  const mw = w*0.22, mh = h*0.12;
+  sctx.ellipse(mx,my, mw, mh, 0, 0, Math.PI, false);
+  sctx.stroke();
+
+  // jitter bars
+  if(Math.random()<0.35){
+    sctx.fillStyle = "rgba(255,255,255,0.10)";
+    for(let k=0;k<8;k++){
+      const yy = Math.random()*h;
+      sctx.fillRect(0, yy, w, 2 + Math.random()*3);
+    }
+  }
+
+  // vignette
+  const vg = sctx.createRadialGradient(w*0.5,h*0.52, w*0.12, w*0.5,h*0.52, w*0.75);
+  vg.addColorStop(0, "rgba(0,0,0,0)");
+  vg.addColorStop(1, "rgba(0,0,0,0.86)");
+  sctx.fillStyle = vg;
+  sctx.fillRect(0,0,w,h);
+}
+
 let scareBusy = false;
 async function jumpScare(){
   if(scareBusy) return;
   scareBusy = true;
-  await arm(); // ensures audio works (Continue click is a gesture anyway)
 
-  const scare = document.getElementById("scare");
+  await arm(); // ensure audio (Continue click is a gesture)
+  resizeScare();
+
+  // little buildup freeze + zoom on CCTV frame
+  msgEl.textContent = "Signal unstable…";
+  modeEl.textContent = "RE-SYNC";
+  frame.style.transform = "scale(1.015)";
+  glitchHit(340);
+
+  setTimeout(()=>{ frame.style.transform = ""; }, 220);
+
+  // show scare
   scare.classList.add("show");
   scare.setAttribute("aria-hidden","false");
 
-  // hard hit
-  doFlash();
-  glitchHit(420);
-  burstNoise(0.22);
-  beep(1400,0.06,"square",0.14);
-  if(navigator.vibrate) navigator.vibrate([90,30,90,30,140]);
+  // sound + vibration
+  playScareSound();
+  if(navigator.vibrate) navigator.vibrate([90,40,90,40,140]);
 
-  // short + sharp (better than long)
+  const start = performance.now();
+  const run = (now)=>{
+    drawScareFace(now - start);
+    scareRAF = requestAnimationFrame(run);
+  };
+  scareRAF = requestAnimationFrame(run);
+
+  // keep it on screen long enough to “land”
   setTimeout(()=>{
+    if(scareRAF) cancelAnimationFrame(scareRAF);
     scare.classList.remove("show");
     scare.setAttribute("aria-hidden","true");
     scareBusy = false;
-  }, 480);
+  }, 1350);
 }
 
 /* ========= Timeline ========= */
@@ -612,14 +821,15 @@ document.getElementById("d1no").addEventListener("click", ()=>{
 
 document.getElementById("d1ok").addEventListener("click", async ()=>{
   showDialog("d1", false);
-  msgEl.textContent = "Analysing feed…";
+  msgEl.textContent = "Continuing…";
   modeEl.textContent = "ANALYSE";
 
-  // >>> JUMPSCARE RIGHT AFTER CONTINUE <<<
+  // BIGGER scare right after Continue
   await jumpScare();
 
-  // then quickly move to the report prompt
-  setTimeout(()=>{ showDialog("d2", true); }, 250);
+  // then show report prompt
+  msgEl.textContent = "Viewer error detected";
+  setTimeout(()=>{ showDialog("d2", true); }, 260);
 });
 
 document.getElementById("d2ok").addEventListener("click", ()=>{
