@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f0f10" />
+<title>Stop The Clock</title>
+<meta name="description" content="Stop the clock on the target time — beat my score!" />
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:
+    radial-gradient(900px 600px at 60% -10%, rgba(58,130,247,.16), transparent 55%),
+    radial-gradient(900px 650px at 10% 110%, rgba(124,58,237,.12), transparent 55%),
+    #0f0f10;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+}
+
+.card{
+  width:min(520px,95vw);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:20px;
+  padding:12px;
+  box-shadow:0 18px 70px rgba(0,0,0,.55);
+}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.title{font-weight:950;font-size:18px;margin:0;line-height:1.05}
+.sub{margin:4px 0 0;color:rgba(255,255,255,.72);font-size:12px;line-height:1.25}
+.pill{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:10px 0 8px;
+}
+.stat{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.25);
+  border-radius:14px;
+  padding:8px;
+  text-align:center;
+}
+.k{font-size:11px;color:rgba(255,255,255,.6);line-height:1}
+.v{font-size:18px;font-weight:950;line-height:1.1}
+
+.panel{
+  margin-top:8px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.30);
+  padding:14px 12px;
+  text-align:center;
+}
+
+.bigTime{
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-weight:950;
+  font-size:44px;
+  letter-spacing:.02em;
+  margin:6px 0;
+}
+
+.hint{
+  color:rgba(255,255,255,.72);
+  font-size:12px;
+  margin-top:6px;
+  line-height:1.3;
+}
+
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{
+  flex:1;
+  min-width:140px;
+  border:none;
+  border-radius:12px;
+  padding:11px 10px;
+  font-weight:950;
+  cursor:pointer;
+  font-size:14px;
+}
+.primary{background:linear-gradient(135deg,#3a82f7,#7c3aed);color:#fff}
+.stop{background:linear-gradient(135deg,#ff3b30,#ff7a18);color:#fff}
+.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.10)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+.toast{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.78);
+  border: 1px solid rgba(255,255,255,.12);
+  color:#fff;
+  padding:8px 10px;
+  border-radius: 12px;
+  font-size:12px;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .18s ease;
+  max-width: min(520px, 92vw);
+  text-align:center;
+  z-index:50;
+}
+.toast.show{opacity:1}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <div class="top">
+    <div>
+      <h1 class="title">Stop The Clock</h1>
+      <div class="sub">Hit <b>Stop</b> as close to the target as you can.</div>
+    </div>
+    <div class="pill" id="statusPill">Ready</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Target</div><div class="v" id="targetV">--</div></div>
+    <div class="stat"><div class="k">Score</div><div class="v" id="scoreV">0</div></div>
+    <div class="stat"><div class="k">Best</div><div class="v" id="bestV">0</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="k" style="color:rgba(255,255,255,.6)">Timer</div>
+    <div class="bigTime" id="timerV">0.00s</div>
+    <div class="hint" id="resultHint">Press Start to get a target time.</div>
+  </div>
+
+  <div class="row">
+    <button class="btn primary" id="startBtn">Start</button>
+    <button class="btn stop" id="stopBtn" disabled>Stop</button>
+  </div>
+
+  <div class="row">
+    <button class="btn ghost" id="shareBtn" disabled>Share score</button>
+    <button class="btn ghost" id="menuBtn">Back to menu</button>
+  </div>
+
+  <div class="row">
+    <button class="btn ghost" id="resetBestBtn">Reset best</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =============================
+   Funnel / sharing
+============================= */
+const MAIN_PAGE_URL = "https://xstajayx.github.io/message-media-space/";
+const GAME_KEY = "stop-the-clock";
+
+/* =============================
+   DOM
+============================= */
+const targetV = document.getElementById("targetV");
+const scoreV  = document.getElementById("scoreV");
+const bestV   = document.getElementById("bestV");
+const timerV  = document.getElementById("timerV");
+const statusPill = document.getElementById("statusPill");
+const resultHint = document.getElementById("resultHint");
+
+const startBtn = document.getElementById("startBtn");
+const stopBtn  = document.getElementById("stopBtn");
+const shareBtn = document.getElementById("shareBtn");
+const menuBtn  = document.getElementById("menuBtn");
+const resetBestBtn = document.getElementById("resetBestBtn");
+
+const toast = document.getElementById("toast");
+function showToast(msg, ms=1400){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>toast.classList.remove("show"), ms);
+}
+
+/* =============================
+   Storage
+============================= */
+let best = Number(localStorage.getItem("best_"+GAME_KEY) || 0);
+bestV.textContent = String(best);
+
+/* =============================
+   State
+============================= */
+let running = false;
+let startT = 0;
+let raf = 0;
+
+let target = 0;
+let score = 0;
+
+function fmt(sec){
+  return sec.toFixed(2) + "s";
+}
+
+function newTarget(){
+  // sweet spot: 2.50s to 7.50s in 0.01 steps
+  const min = 2.50, max = 7.50;
+  target = Math.round((min + Math.random()*(max-min)) * 100) / 100;
+  targetV.textContent = fmt(target);
+}
+
+function updateTimer(){
+  if(!running) return;
+  const t = (performance.now() - startT) / 1000;
+  timerV.textContent = fmt(t);
+  raf = requestAnimationFrame(updateTimer);
+}
+
+function resetUI(){
+  running = false;
+  cancelAnimationFrame(raf);
+  timerV.textContent = "0.00s";
+  scoreV.textContent = "0";
+  targetV.textContent = "--";
+  statusPill.textContent = "Ready";
+  resultHint.textContent = "Press Start to get a target time.";
+  stopBtn.disabled = true;
+  shareBtn.disabled = true;
+}
+
+function startGame(){
+  if(running) return;
+  score = 0;
+  scoreV.textContent = "0";
+  newTarget();
+  resultHint.textContent = "Stop as close as possible to the target.";
+  statusPill.textContent = "RUN";
+  running = true;
+  startT = performance.now();
+  stopBtn.disabled = false;
+  shareBtn.disabled = true;
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(updateTimer);
+}
+
+function stopGame(){
+  if(!running) return;
+  running = false;
+  cancelAnimationFrame(raf);
+
+  const finalT = (performance.now() - startT) / 1000;
+  timerV.textContent = fmt(finalT);
+
+  const diff = Math.abs(finalT - target);
+  // Scoring: 1000 = perfect, decreases with error
+  // 0.00s diff => 1000
+  // 0.50s diff => ~0
+  const raw = Math.max(0, 1000 - Math.round(diff * 2000));
+  score = raw;
+  scoreV.textContent = String(score);
+
+  statusPill.textContent = "DONE";
+  stopBtn.disabled = true;
+  shareBtn.disabled = false;
+
+  // Friendly feedback
+  let msg = "";
+  if(diff < 0.03) msg = `NAILED IT 🔥 off by ${diff.toFixed(2)}s`;
+  else if(diff < 0.08) msg = `So close 😮 off by ${diff.toFixed(2)}s`;
+  else if(diff < 0.15) msg = `Decent! off by ${diff.toFixed(2)}s`;
+  else msg = `Oof 😅 off by ${diff.toFixed(2)}s`;
+  resultHint.textContent = `Target ${fmt(target)} • You got ${fmt(finalT)} • ${msg}`;
+
+  if(score > best){
+    best = score;
+    localStorage.setItem("best_"+GAME_KEY, String(best));
+    bestV.textContent = String(best);
+    showToast("New best! 🔥 " + best);
+  }else{
+    showToast("Score: " + score);
+  }
+}
+
+async function shareScore(){
+  const u = new URL(MAIN_PAGE_URL);
+  u.searchParams.set("game", GAME_KEY);
+  u.searchParams.set("score", String(score));
+
+  const text = `Try this! My score is ${score} ⏱️`;
+  const data = { title:"Stop The Clock", text, url:u.toString() };
+
+  if(navigator.share){
+    try{ await navigator.share(data); return; }catch(e){}
+  }
+  try{
+    await navigator.clipboard.writeText(`${text} ${u.toString()}`);
+    showToast("Copied share text + link ✅");
+  }catch(e){
+    prompt("Copy this:", `${text} ${u.toString()}`);
+  }
+}
+
+/* Buttons */
+startBtn.addEventListener("click", startGame);
+stopBtn.addEventListener("click", stopGame);
+shareBtn.addEventListener("click", shareScore);
+menuBtn.addEventListener("click", ()=> location.href = MAIN_PAGE_URL);
+
+resetBestBtn.addEventListener("click", ()=>{
+  localStorage.removeItem("best_"+GAME_KEY);
+  best = 0;
+  bestV.textContent = "0";
+  showToast("Best reset");
+});
+
+/* IMPORTANT: No tap-to-restart */
+document.addEventListener("pointerdown", (e)=>{
+  // prevent any “tap screen = start again” behavior
+},{passive:true});
+
+resetUI();
+</script>
+</body>
+</html>
