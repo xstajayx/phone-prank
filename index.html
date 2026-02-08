@@ -44,7 +44,7 @@
     box-shadow:0 20px 70px rgba(0,0,0,.45);
   }
   .title{ font-size:20px; font-weight:900; margin-bottom:6px; }
-  .sub{ font-size:14px; color:var(--muted); }
+  .sub{ font-size:14px; color:var(--muted); line-height:1.35; }
 
   .section{ margin-top:14px; }
   .section h3{
@@ -52,6 +52,10 @@
     text-transform:uppercase;
     color:rgba(255,255,255,.6);
     margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
   }
 
   .item{
@@ -65,8 +69,19 @@
     background:rgba(255,255,255,.04);
     margin-bottom:10px;
   }
-  .left{ display:flex; align-items:center; gap:10px; }
+  .left{ display:flex; align-items:center; gap:10px; min-width:0; }
   .ico{ font-size:20px; }
+  .label{
+    display:flex; flex-direction:column; min-width:0;
+  }
+  .label b{
+    font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .label span{
+    font-size:12px; color:rgba(255,255,255,.65);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
   .btn, .btn2{
     border-radius:14px;
     padding:10px 12px;
@@ -84,7 +99,6 @@
     color:#fff;
   }
 
-  /* Ad container styling */
   .adSlot{
     margin-top:12px;
     padding:10px;
@@ -100,6 +114,40 @@
     color:rgba(255,255,255,.5);
     font-size:12px;
   }
+
+  /* Filter + trending */
+  .pillRow{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill{
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.06);
+    border-radius:999px;
+    padding:8px 10px;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+    user-select:none;
+  }
+  .pill.active{
+    background:rgba(58,130,247,.18);
+    border-color:rgba(58,130,247,.28);
+  }
+  .trend{
+    margin-top:10px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:rgba(255,255,255,.04);
+    padding:10px;
+  }
+  .trendItem{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 8px;
+    border-radius:14px;
+  }
+  .trendItem + .trendItem{ border-top:1px solid rgba(255,255,255,.08); }
+  .trendLeft{ display:flex; flex-direction:column; min-width:0; }
+  .trendLeft b{ font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .trendLeft span{ font-size:12px; color:rgba(255,255,255,.65); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mono{ font-family: ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace; font-variant-numeric: tabular-nums;}
 </style>
 </head>
 
@@ -109,8 +157,24 @@
   <div class="card">
     <div class="title">Quick share</div>
     <div class="sub">
-      This was just a web prank. Nothing on the phone was accessed.
+      This was just a web prank + mini games. Nothing on the phone was accessed.<br/>
       Pick one below and send it to a friend 😈
+    </div>
+
+    <div class="section" style="margin-top:12px;">
+      <h3>
+        Filter
+        <span class="pillRow">
+          <span class="pill active" id="fAll">All</span>
+          <span class="pill" id="fPranks">Pranks</span>
+          <span class="pill" id="fGames">Games</span>
+        </span>
+      </h3>
+
+      <div class="trend" id="trendBox" style="display:none;">
+        <div style="font-size:12px; color:rgba(255,255,255,.6); text-transform:uppercase; margin:0 0 6px;">Trending scores</div>
+        <div id="trendList"></div>
+      </div>
     </div>
   </div>
 
@@ -125,43 +189,79 @@
   </div>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-  <div class="section">
+  <!-- PRANKS -->
+  <div class="section" id="secPranks">
     <h3>Pranks</h3>
 
     <div class="item">
       <div class="left">
         <div class="ico">💬</div>
-        <div>Message loading</div>
+        <div class="label">
+          <b>Message loading</b>
+          <span>Fake message buffer prank</span>
+        </div>
       </div>
       <div>
         <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/message/'">Open</button>
-        <button class="btn" onclick="sharePrank('https://xstajayx.github.io/message-media-space/p/message/')">Share</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/message/','Prank')">Share</button>
       </div>
     </div>
 
     <div class="item">
       <div class="left">
         <div class="ico">📹</div>
-        <div>CCTV viewer</div>
+        <div class="label">
+          <b>CCTV viewer</b>
+          <span>Viewer + face slam</span>
+        </div>
       </div>
       <div>
         <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/scenario-b/'">Open</button>
-        <button class="btn" onclick="sharePrank('https://xstajayx.github.io/message-media-space/p/scenario-b/')">Share</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/scenario-b/','Prank')">Share</button>
       </div>
     </div>
 
-    <!-- ✅ NEW ITEM: Tap Rush (Tap Score) -->
     <div class="item">
       <div class="left">
-        <div class="ico">👆</div>
-        <div>Tap Rush</div>
+        <div class="ico">🔎</div>
+        <div class="label">
+          <b>Fake Google</b>
+          <span>Search bar that “auto types”</span>
+        </div>
       </div>
       <div>
-        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/tap-score/'">Open</button>
-        <button class="btn" onclick="sharePrank('https://xstajayx.github.io/message-media-space/p/tap-score/')">Share</button>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/fake-google/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/fake-google/','Prank')">Share</button>
       </div>
     </div>
 
+    <div class="item">
+      <div class="left">
+        <div class="ico">🔊</div>
+        <div class="label">
+          <b>Volume Won’t Work</b>
+          <span>Slider fights back 😂</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/volume-prank/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/volume-prank/','Prank')">Share</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">🧊</div>
+        <div class="label">
+          <b>Frozen Screen</b>
+          <span>Looks stuck… until it isn’t</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/frozen-screen/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/frozen-screen/','Prank')">Share</button>
+      </div>
+    </div>
   </div>
 
   <!-- 🔹 MID AD -->
@@ -175,6 +275,96 @@
   </div>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
+  <!-- GAMES -->
+  <div class="section" id="secGames">
+    <h3>Mini games</h3>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">👆</div>
+        <div class="label">
+          <b>Tap Score</b>
+          <span>Tap fast before time runs out</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/tap-score/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/tap-score/','Game')">Share</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">⏱️</div>
+        <div class="label">
+          <b>Stop The Clock</b>
+          <span>Stop on the target time</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/stop-the-clock/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/stop-the-clock/','Game')">Share</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">🦆</div>
+        <div class="label">
+          <b>Quick Hunt</b>
+          <span>Ducks + ammo + wrong targets</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/quick-hunt/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/quick-hunt/','Game')">Share</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">🎯</div>
+        <div class="label">
+          <b>One Tap Aim</b>
+          <span>Tap at the perfect moment</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/one-tap-aim/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/one-tap-aim/','Game')">Share</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">⚡</div>
+        <div class="label">
+          <b>Reaction Snap</b>
+          <span>Wait… then TAP instantly</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/reaction-snap/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/reaction-snap/','Game')">Share</button>
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="left">
+        <div class="ico">🧠</div>
+        <div class="label">
+          <b>Memory Flash</b>
+          <span>Remember the 5-tile pattern</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn2" onclick="location.href='https://xstajayx.github.io/message-media-space/p/memory-flash/'">Open</button>
+        <button class="btn" onclick="shareLink('https://xstajayx.github.io/message-media-space/p/memory-flash/','Game')">Share</button>
+      </div>
+    </div>
+
+  </div>
+
   <div class="tiny">
     Built by Jworldcreations
   </div>
@@ -182,10 +372,12 @@
 </div>
 
 <script>
-async function sharePrank(url){
+const MAIN_PAGE_URL = "https://xstajayx.github.io/message-media-space/";
+
+async function shareLink(url, kind){
   const data = {
     title: "Message Media Space",
-    text: "Try this 😈",
+    text: `${kind} 😈`,
     url
   };
   if(navigator.share){
@@ -195,9 +387,87 @@ async function sharePrank(url){
     await navigator.clipboard.writeText(url);
     alert("Link copied ✅");
   }catch(e){
-    prompt("Copy this link:", url);
+    prompt("Copy link:", url);
   }
 }
+
+/* ===== Trending score capture =====
+Games should send users back to:
+MAIN_PAGE_URL?game=quick-hunt&score=123
+*/
+function saveScoreFromParams(){
+  const u = new URL(location.href);
+  const game = u.searchParams.get("game");
+  const scoreStr = u.searchParams.get("score");
+  if(!game || !scoreStr) return;
+
+  const score = Number(scoreStr);
+  if(!Number.isFinite(score)) return;
+
+  const key = "mms_scores";
+  const store = JSON.parse(localStorage.getItem(key) || "{}");
+  const prev = Number(store[game] || 0);
+  if(score > prev) store[game] = score;
+  localStorage.setItem(key, JSON.stringify(store));
+
+  // clean URL (optional)
+  u.searchParams.delete("game");
+  u.searchParams.delete("score");
+  history.replaceState({}, "", u.toString());
+}
+
+function renderTrending(){
+  const box = document.getElementById("trendBox");
+  const list = document.getElementById("trendList");
+  const store = JSON.parse(localStorage.getItem("mms_scores") || "{}");
+  const entries = Object.entries(store).map(([g,s])=>({g, s:Number(s)})).filter(x=>Number.isFinite(x.s));
+  entries.sort((a,b)=>b.s-a.s);
+  if(entries.length === 0){ box.style.display="none"; return; }
+
+  const names = {
+    "tap-score":"Tap Score",
+    "stop-the-clock":"Stop The Clock",
+    "quick-hunt":"Quick Hunt",
+    "one-tap-aim":"One Tap Aim",
+    "reaction-snap":"Reaction Snap",
+    "memory-flash":"Memory Flash"
+  };
+
+  list.innerHTML = "";
+  for(const e of entries.slice(0,4)){
+    const row = document.createElement("div");
+    row.className = "trendItem";
+    row.innerHTML = `
+      <div class="trendLeft">
+        <b>${names[e.g] || e.g}</b>
+        <span>Best score saved</span>
+      </div>
+      <div class="mono" style="font-weight:950;">${e.s}</div>
+    `;
+    list.appendChild(row);
+  }
+  box.style.display = "block";
+}
+
+/* ===== Filter toggles ===== */
+function setFilter(mode){
+  const secP = document.getElementById("secPranks");
+  const secG = document.getElementById("secGames");
+  document.getElementById("fAll").classList.toggle("active", mode==="all");
+  document.getElementById("fPranks").classList.toggle("active", mode==="pranks");
+  document.getElementById("fGames").classList.toggle("active", mode==="games");
+
+  if(mode==="all"){ secP.style.display="block"; secG.style.display="block"; }
+  if(mode==="pranks"){ secP.style.display="block"; secG.style.display="none"; }
+  if(mode==="games"){ secP.style.display="none"; secG.style.display="block"; }
+}
+
+document.getElementById("fAll").addEventListener("click", ()=>setFilter("all"));
+document.getElementById("fPranks").addEventListener("click", ()=>setFilter("pranks"));
+document.getElementById("fGames").addEventListener("click", ()=>setFilter("games"));
+
+saveScoreFromParams();
+renderTrending();
 </script>
 </body>
 </html>
