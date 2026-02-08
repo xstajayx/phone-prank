@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0f10" />
+  <title>Tap Rush</title>
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 50% 0%, #1b1d22, #0f0f10 60%, #0b0c0e);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      overflow:hidden;
+    }
+    .card{
+      width:min(520px, 94vw);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(20,20,22,.72);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      box-shadow: 0 18px 70px rgba(0,0,0,.55);
+      padding:16px;
+    }
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .title{
+      font-weight:800;
+      letter-spacing:.2px;
+      margin:0;
+      font-size:18px;
+    }
+    .sub{
+      margin:6px 0 0;
+      color:rgba(255,255,255,.75);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding:8px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      color:rgba(255,255,255,.9);
+      white-space:nowrap;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin: 12px 0;
+    }
+    .stat{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      border-radius: 16px;
+      padding:10px;
+      text-align:center;
+    }
+    .stat .k{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:4px}
+    .stat .v{font-size:20px;font-weight:900}
+
+    .arena{
+      position:relative;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.20));
+      height: 340px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      user-select:none;
+    }
+    @media (max-height: 750px){
+      .arena{height: 300px;}
+    }
+
+    .tapBtn{
+      width:min(300px, 82vw);
+      height:min(300px, 82vw);
+      max-width:300px;
+      max-height:300px;
+      border-radius: 28px;
+      border:1px solid rgba(255,255,255,.14);
+      background: radial-gradient(160px 160px at 35% 30%, rgba(255,255,255,.22), rgba(255,255,255,.07), rgba(0,0,0,.12));
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      cursor:pointer;
+      transform: translateZ(0);
+      transition: transform .05s ease;
+    }
+    .tapBtn:active{ transform: scale(.985); }
+    .tapBtn .big{
+      font-size:44px;
+      font-weight:950;
+      letter-spacing:-1px;
+      margin:0;
+      line-height:1;
+    }
+    .tapBtn .small{
+      margin-top:10px;
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+      text-align:center;
+      padding: 0 10px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .btn{
+      flex:1;
+      min-width: 150px;
+      border:none;
+      border-radius: 14px;
+      padding:12px 14px;
+      font-weight:850;
+      cursor:pointer;
+    }
+    .btn.primary{ background:#3a82f7; color:#fff; }
+    .btn.ghost{ background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.12); }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      background: rgba(0,0,0,.75);
+      border: 1px solid rgba(255,255,255,.12);
+      color:#fff;
+      padding:10px 12px;
+      border-radius: 12px;
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease;
+      max-width: min(520px, 92vw);
+      text-align:center;
+      z-index:50;
+    }
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <div>
+        <h1 class="title">Tap Rush</h1>
+        <p class="sub">Tap the square as many times as you can in <b>10 seconds</b>. No tricks. Fair score.</p>
+      </div>
+      <div class="pill" id="statusPill">Ready</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Time</div><div class="v" id="timeV">10.0</div></div>
+      <div class="stat"><div class="k">Score</div><div class="v" id="scoreV">0</div></div>
+      <div class="stat"><div class="k">Best</div><div class="v" id="bestV">0</div></div>
+    </div>
+
+    <div class="arena">
+      <div class="tapBtn" id="tapBtn" role="button" aria-label="Tap button">
+        <div class="big" id="tapBig">TAP</div>
+        <div class="small" id="tapSmall">Tap to start</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="startBtn">Start</button>
+      <button class="btn ghost" id="shareBtn" disabled>Share score</button>
+    </div>
+
+    <div class="row">
+      <button class="btn ghost" id="resetBestBtn">Reset best</button>
+      <button class="btn ghost" id="openMainBtn">Back to main page</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // 🔧 Your main page (ads live here)
+  const MAIN_PAGE_URL = "https://xstajayx.github.io/message-media-space/";
+
+  const GAME_KEY = "taprush";
+  const ROUND_SECONDS = 10;
+
+  const elTime = document.getElementById("timeV");
+  const elScore = document.getElementById("scoreV");
+  const elBest = document.getElementById("bestV");
+  const statusPill = document.getElementById("statusPill");
+
+  const tapBtn = document.getElementById("tapBtn");
+  const tapBig = document.getElementById("tapBig");
+  const tapSmall = document.getElementById("tapSmall");
+
+  const startBtn = document.getElementById("startBtn");
+  const shareBtn = document.getElementById("shareBtn");
+  const resetBestBtn = document.getElementById("resetBestBtn");
+  const openMainBtn = document.getElementById("openMainBtn");
+
+  const toast = document.getElementById("toast");
+
+  let best = Number(localStorage.getItem("best_" + GAME_KEY) || 0);
+  elBest.textContent = best;
+
+  let running = false;
+  let finished = false; // ✅ prevents auto-restart after 0.0
+  let score = 0;
+  let endAt = 0;
+  let raf = 0;
+
+  function showToast(msg, ms=1600){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>toast.classList.remove("show"), ms);
+  }
+
+  function setReady(){
+    running = false;
+    finished = false; // ✅ reset lock
+    score = 0;
+    elScore.textContent = "0";
+    elTime.textContent = ROUND_SECONDS.toFixed(1);
+    statusPill.textContent = "Ready";
+    tapBig.textContent = "TAP";
+    tapSmall.textContent = "Tap to start";
+    shareBtn.disabled = true;
+    cancelAnimationFrame(raf);
+  }
+
+  function start(){
+    if(running) return;
+    finished = false; // ✅ clear lock
+    running = true;
+    score = 0;
+    elScore.textContent = "0";
+    endAt = performance.now() + ROUND_SECONDS * 1000;
+    statusPill.textContent = "GO!";
+    tapSmall.textContent = "Tap fast!";
+    shareBtn.disabled = true;
+
+    tick();
+  }
+
+  function finish(){
+    running = false;
+    finished = true; // ✅ lock taps after finish
+    statusPill.textContent = "Done";
+    tapSmall.textContent = "Nice! Hit Share or press Start.";
+    shareBtn.disabled = false;
+
+    if(score > best){
+      best = score;
+      localStorage.setItem("best_" + GAME_KEY, String(best));
+      elBest.textContent = best;
+      showToast("New best! 🔥 " + best);
+    }else{
+      showToast("Score: " + score);
+    }
+  }
+
+  function tick(){
+    const leftMs = Math.max(0, endAt - performance.now());
+    elTime.textContent = (leftMs/1000).toFixed(1);
+
+    if(leftMs <= 0){
+      elTime.textContent = "0.0";
+      finish();
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function tap(){
+    if(finished) return; // ✅ no restart after 0.0
+    if(!running){
+      start(); // still allows “tap to start” from Ready
+      return;
+    }
+    score++;
+    elScore.textContent = String(score);
+  }
+
+  function buildShareUrl(s){
+    const u = new URL(MAIN_PAGE_URL);
+    u.searchParams.set("game", GAME_KEY);
+    u.searchParams.set("score", String(s));
+    return u.toString();
+  }
+
+  async function shareScore(){
+    const url = buildShareUrl(score);
+    const text = `Try this! My score is ${score} 😄`;
+
+    try{
+      if(navigator.share){
+        await navigator.share({ title: "Tap Rush", text, url });
+        return;
+      }
+    }catch(e){
+      // user cancelled share; ignore
+    }
+
+    // fallback: copy link
+    try{
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      showToast("Copied share text + link ✅");
+    }catch(e){
+      prompt("Copy this:", `${text} ${url}`);
+    }
+  }
+
+  // events
+  startBtn.addEventListener("click", start);
+
+  tapBtn.addEventListener("click", tap);
+  tapBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); tap(); }, {passive:false});
+
+  shareBtn.addEventListener("click", shareScore);
+
+  resetBestBtn.addEventListener("click", ()=>{
+    localStorage.removeItem("best_" + GAME_KEY);
+    best = 0;
+    elBest.textContent = "0";
+    showToast("Best reset");
+  });
+
+  openMainBtn.addEventListener("click", ()=>{
+    location.href = MAIN_PAGE_URL;
+  });
+
+  // init
+  setReady();
+</script>
+</body>
+</html>
