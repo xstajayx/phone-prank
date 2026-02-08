@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f0f10" />
+<title>Memory Flash</title>
+<meta name="description" content="Memory Flash — beat my score!" />
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  margin:0;color:#fff;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:
+    radial-gradient(900px 600px at 60% -10%, rgba(58,130,247,.16), transparent 55%),
+    radial-gradient(900px 650px at 10% 110%, rgba(124,58,237,.12), transparent 55%),
+    #0f0f10;
+  display:flex;justify-content:center;align-items:flex-start;
+  padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+}
+.card{
+  width:min(520px,95vw);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:20px;
+  padding:12px;
+  box-shadow:0 18px 70px rgba(0,0,0,.55);
+}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.title{font-weight:950;font-size:18px;margin:0;line-height:1.05}
+.sub{margin:4px 0 0;color:rgba(255,255,255,.72);font-size:12px;line-height:1.25}
+.pill{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 8px}
+.stat{border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.25);border-radius:14px;padding:8px;text-align:center}
+.k{font-size:11px;color:rgba(255,255,255,.6);line-height:1}
+.v{font-size:18px;font-weight:950;line-height:1.1;font-variant-numeric:tabular-nums;font-family:ui-monospace,Menlo,Monaco,Consolas,"Courier New",monospace}
+
+.grid{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.28);
+  border-radius:16px;
+  padding:10px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  height:min(62vh, 520px);
+}
+.tile{
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  font-size:16px;
+  user-select:none;
+  cursor:pointer;
+}
+.tile.on{
+  background:rgba(58,130,247,.22);
+  border-color:rgba(58,130,247,.30);
+  box-shadow:0 0 22px rgba(58,130,247,.12);
+}
+.tile.good{
+  background:rgba(52,199,89,.18);
+  border-color:rgba(52,199,89,.25);
+}
+.tile.bad{
+  background:rgba(255,59,48,.18);
+  border-color:rgba(255,59,48,.25);
+}
+
+.hint{padding:10px 8px; font-size:12px; color:rgba(255,255,255,.72); text-align:center; line-height:1.3}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{flex:1;min-width:140px;border:none;border-radius:12px;padding:11px 10px;font-weight:950;cursor:pointer;font-size:14px}
+.primary{background:linear-gradient(135deg,#3a82f7,#7c3aed);color:#fff}
+.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.10)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));
+  background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.12);padding:8px 10px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .18s ease;max-width:min(520px,92vw);text-align:center;z-index:50}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div>
+      <h1 class="title">Memory Flash</h1>
+      <div class="sub">Watch the pattern… then repeat it.</div>
+    </div>
+    <div class="pill" id="pill">Ready</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Level</div><div class="v" id="lvlV">1</div></div>
+    <div class="stat"><div class="k">Score</div><div class="v" id="scoreV">0</div></div>
+    <div class="stat"><div class="k">Best</div><div class="v" id="bestV">0</div></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="hint" id="hint">Press Start. You get 3 lives.</div>
+
+  <div class="row">
+    <button class="btn primary" id="startBtn">Start</button>
+    <button class="btn ghost" id="shareBtn" disabled>Share score</button>
+  </div>
+  <div class="row">
+    <button class="btn ghost" id="menuBtn">Back to menu</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const MAIN_PAGE_URL="https://xstajayx.github.io/message-media-space/";
+const GAME_KEY="memory-flash";
+const LEVEL_CAP = 99; // ✅ was 7, now 99
+
+const grid=document.getElementById("grid");
+const pill=document.getElementById("pill");
+const hint=document.getElementById("hint");
+const lvlV=document.getElementById("lvlV");
+const scoreV=document.getElementById("scoreV");
+const bestV=document.getElementById("bestV");
+const startBtn=document.getElementById("startBtn");
+const shareBtn=document.getElementById("shareBtn");
+const menuBtn=document.getElementById("menuBtn");
+const toast=document.getElementById("toast");
+
+function showToast(msg, ms=1200){
+  toast.textContent=msg; toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>toast.classList.remove("show"), ms);
+}
+
+let best=Number(localStorage.getItem("best_"+GAME_KEY)||0);
+bestV.textContent=String(best);
+
+const tiles=[];
+for(let i=0;i<9;i++){
+  const d=document.createElement("div");
+  d.className="tile";
+  d.textContent="";
+  d.dataset.i=String(i);
+  grid.appendChild(d);
+  tiles.push(d);
+}
+
+let running=false;
+let level=1;
+let score=0;
+let lives=3;
+
+let pattern=[];
+let input=[];
+let accepting=false;
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function pickInt(max){ return Math.floor(Math.random()*max); }
+
+function reset(){
+  running=false;
+  level=1; score=0; lives=3;
+  pattern=[]; input=[]; accepting=false;
+  lvlV.textContent="1";
+  scoreV.textContent="0";
+  pill.textContent="Ready";
+  hint.textContent="Press Start. You get 3 lives.";
+  shareBtn.disabled=true;
+  startBtn.disabled=false;
+  tiles.forEach(t=>t.className="tile");
+}
+
+async function flashPattern(){
+  accepting=false;
+  pill.textContent="Watch";
+  hint.textContent=`Memorise ${pattern.length} tiles… (Lives: ${lives})`;
+  tiles.forEach(t=>t.className="tile");
+  await sleep(240);
+
+  for(const idx of pattern){
+    const t=tiles[idx];
+    t.classList.add("on");
+    await sleep(240);
+    t.classList.remove("on");
+    await sleep(110);
+  }
+
+  pill.textContent="Repeat";
+  hint.textContent=`Repeat the pattern. Lives: ${lives}`;
+  input=[];
+  accepting=true;
+}
+
+function addStep(){
+  let next = pickInt(9);
+  if(pattern.length && next===pattern[pattern.length-1]) next = (next+1)%9;
+  pattern.push(next);
+}
+
+async function start(){
+  reset();
+  running=true;
+  startBtn.disabled=true;
+  shareBtn.disabled=true;
+
+  // Start length
+  addStep(); addStep(); addStep();
+  await flashPattern();
+}
+
+async function success(){
+  accepting=false;
+
+  // score scaling, keeps it fun up to 99
+  score += 60 + (level*20);
+  scoreV.textContent=String(score);
+
+  if(level >= LEVEL_CAP){
+    // hit cap = victory screen
+    pill.textContent="Legend";
+    hint.textContent=`You reached Level ${LEVEL_CAP}. That’s illegal 🧠🔥`;
+    end();
+    return;
+  }
+
+  level++;
+  lvlV.textContent=String(level);
+  showToast("Correct ✅", 750);
+
+  // Increase difficulty smoothly:
+  // up to level 15: add steps quickly
+  // after that: occasionally add steps, but never boringly long to watch
+  if(level <= 15) addStep();
+  else if(level <= 35 && level % 2 === 0) addStep();
+  else if(level <= 60 && level % 3 === 0) addStep();
+  else if(level % 4 === 0) addStep();
+
+  // Keep pattern watch-time reasonable (soft cap)
+  const SOFT_MAX = 18;
+  if(pattern.length > SOFT_MAX){
+    // trim oldest steps so it stays playable (still counts levels up to 99)
+    pattern = pattern.slice(pattern.length - SOFT_MAX);
+  }
+
+  await sleep(420);
+  await flashPattern();
+}
+
+async function fail(){
+  accepting=false;
+  lives--;
+  tiles.forEach(t=>t.classList.add("bad"));
+  showToast("Wrong 😅", 850);
+  await sleep(420);
+  tiles.forEach(t=>t.className="tile");
+
+  if(lives <= 0){
+    end();
+    return;
+  }
+  await flashPattern();
+}
+
+function end(){
+  running=false;
+  accepting=false;
+  pill.textContent = (lives<=0) ? "Done" : pill.textContent;
+  hint.textContent = (lives<=0) ? `Game over. Score ${score}.` : hint.textContent;
+  startBtn.disabled=false;
+  shareBtn.disabled=false;
+
+  if(score > best){
+    best=score;
+    localStorage.setItem("best_"+GAME_KEY, String(best));
+    bestV.textContent=String(best);
+    showToast("New best! 🔥", 950);
+  }
+}
+
+async function tapTile(i){
+  if(!running || !accepting) return;
+
+  const t=tiles[i];
+  t.classList.add("good");
+  await sleep(110);
+  t.classList.remove("good");
+
+  input.push(i);
+
+  // check prefix
+  for(let k=0;k<input.length;k++){
+    if(input[k] !== pattern[k]){
+      await fail();
+      return;
+    }
+  }
+
+  if(input.length === pattern.length){
+    await success();
+  }
+}
+
+tiles.forEach(t=>{
+  t.addEventListener("click", ()=>tapTile(Number(t.dataset.i)));
+});
+
+async function shareScore(){
+  const u=new URL(MAIN_PAGE_URL);
+  u.searchParams.set("game", GAME_KEY);
+  u.searchParams.set("score", String(score));
+  const text=`Try this! My score is ${score} 🧠`;
+  const data={ title:"Memory Flash", text, url:u.toString() };
+
+  if(navigator.share){
+    try{ await navigator.share(data); return; }catch(e){}
+  }
+  try{
+    await navigator.clipboard.writeText(`${text} ${u.toString()}`);
+    showToast("Copied share text + link ✅");
+  }catch(e){
+    prompt("Copy this:", `${text} ${u.toString()}`);
+  }
+}
+
+startBtn.addEventListener("click", start);
+shareBtn.addEventListener("click", shareScore);
+menuBtn.addEventListener("click", ()=>location.href=MAIN_PAGE_URL);
+
+reset();
+</script>
+</body>
+</html>
